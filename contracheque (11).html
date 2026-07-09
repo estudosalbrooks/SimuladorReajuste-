@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador Remuneração - CBMERJ</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f5fb;
+    --surface: #ffffff;
+    --surface2: #e8f1fb;
+    --border: #b6d0ee;
+    --accent: #1565c0;
+    --accent2: #1976d2;
+    --green: #1a7a4a;
+    --red: #c0392b;
+    --yellow: #b45309;
+    --text: #0d1f3c;
+    --muted: #5a7a99;
+    --label: #2c5282;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height: 100vh;
+    padding: 24px 16px;
+  }
+
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #1565c0, #42a5f5);
+  }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .org {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .org-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .org-sub {
+    font-size: 13px;
+    color: var(--label);
+  }
+  .badge {
+    background: linear-gradient(135deg, #1565c0, #42a5f5);
+    color: white;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+  }
+
+  .header-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .info-field label {
+    display: block;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .info-field input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 10px;
+    width: 100%;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .info-field input:focus {
+    border-color: var(--accent);
+  }
+  .info-field select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 10px;
+    width: 100%;
+    transition: border-color 0.2s;
+    outline: none;
+    cursor: pointer;
+  }
+  .info-field select:focus {
+    border-color: var(--accent);
+  }
+
+  /* SECTIONS */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .section-title.green { color: var(--green); }
+  .section-title.red { color: var(--red); }
+  .section-title .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 10px 16px;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    text-align: left;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  thead th.right { text-align: right; }
+  tbody tr { border-bottom: 1px solid rgba(100,160,220,0.3); transition: background 0.15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(21,101,192,0.05); }
+  tbody td {
+    padding: 11px 16px;
+    font-size: 13px;
+  }
+  td.code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    width: 60px;
+  }
+  td.desc { color: var(--label); font-weight: 500; }
+  td.formula {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+  }
+  td.pct { width: 80px; }
+  td.valor { width: 130px; text-align: right; }
+
+  /* EDITABLE INPUTS */
+  .pct-input, .val-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 8px;
+    width: 100%;
+    text-align: right;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .pct-input:focus, .val-input:focus {
+    border-color: var(--accent);
+    background: #dbeafe;
+  }
+  .val-input.green { color: var(--green); }
+  .val-input.red { color: var(--red); }
+  .val-calc {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: right;
+    display: block;
+  }
+  .val-calc.green { color: var(--green); }
+  .val-calc.red { color: var(--red); }
+
+  /* ADD DISCOUNT BUTTON */
+  .add-row {
+    padding: 10px 20px 16px;
+    border-top: 1px solid rgba(100,160,220,0.3);
+  }
+  .btn-add {
+    background: var(--surface2);
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn-add:hover {
+    background: #dbeafe;
+    border-color: var(--accent);
+  }
+  .desc-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--label);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 8px;
+    width: 100%;
+    outline: none;
+  }
+  .desc-input:focus { border-color: var(--accent); }
+  .btn-remove {
+    background: none;
+    border: none;
+    color: var(--red);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+  }
+  .btn-remove:hover { opacity: 0.7; }
+  td.remove-col { width: 24px; padding-left: 4px; }
+
+  /* REAJUSTE */
+  .reajuste-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-top: 20px;
+    margin-bottom: 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .reajuste-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #b45309, #d97706);
+  }
+  .reajuste-inner {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .reajuste-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .reajuste-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .reajuste-aviso {
+    width: 100%;
+    background: rgba(192,57,43,0.1);
+    border: 1px solid var(--red);
+    color: var(--red);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 10px 14px;
+    border-radius: 8px;
+  }
+  .reajuste-pct:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background: #eef2f6;
+    border-color: var(--border);
+    color: var(--muted);
+  }
+  .reajuste-input-wrap label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .reajuste-pct {
+    background: var(--surface2);
+    border: 2px solid var(--yellow);
+    border-radius: 8px;
+    color: var(--yellow);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    padding: 8px 12px;
+    width: 100px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .reajuste-pct:focus {
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.2);
+  }
+  .reajuste-diff {
+    display: flex;
+    gap: 14px;
+    background: var(--surface2);
+    border: 1px solid var(--yellow);
+    border-radius: 8px;
+    padding: 8px 16px;
+  }
+  .reajuste-diff-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .reajuste-diff-item label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .reajuste-diff-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--green);
+  }
+  .reajuste-diff-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+  .reajuste-symbol {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 22px;
+    color: var(--yellow);
+    font-weight: 700;
+  }
+  .reajuste-info {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .reajuste-info span { color: var(--yellow); font-weight: 700; }
+  .val-original {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-decoration: line-through;
+    display: block;
+    text-align: right;
+    margin-bottom: 2px;
+  }
+
+  /* TOTALS */
+  .totals {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .total-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .total-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .total-card.ganhos::after { background: var(--green); }
+  .total-card.descontos::after { background: var(--red); }
+  .total-card.liquido::after { background: var(--accent); }
+  .total-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    margin-bottom: 8px;
+  }
+  .total-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .total-value.green { color: var(--green); }
+  .total-value.red { color: var(--red); }
+  .total-value.blue { color: var(--accent2); }
+
+  /* BASE CALC */
+  .base-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    padding: 16px 20px;
+  }
+  .base-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .base-item label {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 5px;
+  }
+  .base-item .bval {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent2);
+  }
+
+  .auth {
+    text-align: center;
+    padding: 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  /* SAIBA MAIS */
+  .info-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .info-box summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--accent);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+  .info-box summary::-webkit-details-marker { display: none; }
+  .info-box summary .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .info-box summary .chevron {
+    margin-left: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    transition: transform 0.2s;
+  }
+  .info-box[open] summary .chevron { transform: rotate(180deg); }
+  .info-box summary:hover { background: rgba(21,101,192,0.05); }
+  .info-content {
+    padding: 4px 20px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .info-content p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+    margin: 14px 0 10px;
+  }
+  .info-content h4 {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--label);
+    margin: 18px 0 6px;
+  }
+  .info-content ol, .info-content ul {
+    margin: 8px 0 8px 20px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+  .info-content ol li, .info-content ul li { margin-bottom: 2px; }
+  .info-content .lead {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--label);
+    margin-top: 12px;
+  }
+  .info-content strong { color: var(--accent); }
+
+  @media (max-width: 600px) {
+    .totals { grid-template-columns: 1fr; }
+    .header-top { flex-direction: column; }
+    td.formula { display: none; }
+  }
+
+  .placeholder-box {
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    padding: 32px 24px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="org-name">Simulador Remuneração</div>
+      </div>
+    </div>
+    <!-- SIMULADOR DE REAJUSTE -->
+    <div class="reajuste-box">
+      <div class="section-title" style="color:var(--yellow); padding:14px 20px; border-bottom:1px solid var(--border);">
+        <span class="dot" style="background:var(--yellow)"></span> Simulador de Reajuste Salarial
+      </div>
+      <div class="reajuste-inner">
+        <div class="reajuste-aviso" id="reajuste_aviso">
+          ⚠️ Selecione um Cargo abaixo para liberar o simulador de reajuste.
+        </div>
+        <div class="reajuste-input-wrap">
+          <label>Percentual de aumento</label>
+          <input class="reajuste-pct" type="number" id="pct_reajuste" value="0" step="0.1" min="0" oninput="calc()" disabled>
+          <span class="reajuste-symbol">%</span>
+        </div>
+        <div class="reajuste-input-wrap">
+          <label>+ Triênio futuro</label>
+          <input class="reajuste-pct" type="number" id="pct_tri_extra" value="0" step="0.1" min="0" oninput="calc()" disabled>
+          <span class="reajuste-symbol">%</span>
+        </div>
+        <div class="reajuste-input-wrap">
+          <label>+ Valor Fixo</label>
+          <input class="reajuste-pct" type="number" id="valor_fixo_extra" value="0" step="0.01" min="0" oninput="calc()" disabled>
+          <span class="reajuste-symbol">R$</span>
+        </div>
+        <div class="reajuste-diff" id="reajuste_diff" style="display:none;">
+          <div class="reajuste-diff-item">
+            <label>Aumento Bruto</label>
+            <span class="reajuste-diff-value" id="diff_bruto">—</span>
+            <span class="reajuste-diff-sub" id="diff_bruto_detail"></span>
+          </div>
+          <div class="reajuste-diff-item">
+            <label>Aumento Líquido</label>
+            <span class="reajuste-diff-value" id="diff_liquido">—</span>
+            <span class="reajuste-diff-sub" id="diff_liquido_detail"></span>
+          </div>
+        </div>
+        <div class="reajuste-info">
+          Ao digitar um percentual, os valores do contracheque são atualizados automaticamente.<br>
+          O valor original fica riscado acima do novo valor. <span>Auxílio Transporte não sofre reajuste.</span><br>
+          Use "+ Triênio futuro" para somar pontos percentuais ao Triênio atual e projetar aumentos futuros junto com o reajuste.<br>
+          "+ Valor Fixo" soma um valor em R$ direto no bruto e no líquido, sem incidir sobre nada (não entra na base do IR nem sofre desconto de saúde/contribuição).
+        </div>
+      </div>
+    </div>
+
+    <div class="header-grid">
+      <div class="info-field">
+        <label>Cargo</label>
+        <select id="cargo" onchange="selectCargo()">
+          <option value="">— Selecione —</option>
+          <option value="subtenente_110">Sub-Tenente (GHP 110%)</option>
+          <option value="subtenente_80">Sub-Tenente (GHP 80%)</option>
+          <option value="1sgt_110">1º Sargento (GHP 110%)</option>
+          <option value="1sgt_80">1º Sargento (GHP 80%)</option>
+          <option value="2sgt_110">2º Sargento (GHP 110%)</option>
+          <option value="2sgt_80">2º Sargento (GHP 80%)</option>
+          <option value="3sgt_110">3º Sargento (GHP 110%)</option>
+          <option value="3sgt_80">3º Sargento (GHP 80%)</option>
+          <option value="cabo_75">Cabo (GHP 75%)</option>
+          <option value="soldado_75">Soldado A/B/C (GHP 75%)</option>
+        </select>
+      </div>
+      <div class="info-field">
+        <label>Nº Dependentes IR</label>
+        <input type="number" id="ndep" value="0" min="0" oninput="syncFromDep()">
+      </div>
+      <div class="info-field">
+        <label>Triênio (%)</label>
+        <input type="number" id="qtd_trienio" value="0" min="0" step="0.01" oninput="syncFromTrienio()">
+      </div>
+    </div>
+  </div>
+
+  <!-- MENSAGEM INICIAL -->
+  <div class="placeholder-box" id="placeholder_msg">
+    Selecione um Cargo acima para exibir as informações do contracheque.
+  </div>
+
+  <div id="conteudo_dados" style="display:none;">
+
+  <!-- VANTAGENS -->
+  <div class="section">
+    <div class="section-title green"><span class="dot"></span> Vantagens</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Descrição</th>
+          <th>Fórmula</th>
+          <th>%</th>
+          <th class="right">Valor (R$)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="desc">Soldo</td>
+          <td class="formula">Base</td>
+          <td class="pct">—</td>
+          <td class="valor">
+            <span class="val-original" id="orig_soldo"></span>
+            <input class="val-input green" id="soldo" type="number" step="0.01" value="1448.93" oninput="calc()">
+          </td>
+        </tr>
+        <tr>
+          <td class="desc">Grat. Reg. Esp. de Trabalho (GRET)</td>
+          <td class="formula">Soldo × %</td>
+          <td class="pct"><input class="pct-input" id="pct_gret" type="number" step="0.01" value="150" oninput="calc()"></td>
+          <td class="valor"><span class="val-original" id="orig_gret"></span><span class="val-calc green" id="val_gret">—</span></td>
+        </tr>
+        <tr>
+          <td class="desc">Grat. Habilit. Profissional (GHP)</td>
+          <td class="formula">Soldo × %</td>
+          <td class="pct"><input class="pct-input" id="pct_ghp" type="number" step="0.01" value="110" oninput="calc()"></td>
+          <td class="valor"><span class="val-original" id="orig_ghp"></span><span class="val-calc green" id="val_ghp">—</span></td>
+        </tr>
+        <tr>
+          <td class="desc">Grat. Risco Ativ. Militar (GRAM)</td>
+          <td class="formula">(Soldo+GHP+GRET) × %</td>
+          <td class="pct"><input class="pct-input" id="pct_gram" type="number" step="0.01" value="62.50" oninput="calc()"></td>
+          <td class="valor"><span class="val-original" id="orig_gram"></span><span class="val-calc green" id="val_gram">—</span></td>
+        </tr>
+        <tr>
+          <td class="desc">Triênio</td>
+          <td class="formula">(Soldo+GRET+GHP+GRAM) × %</td>
+          <td class="pct"><input class="pct-input" id="pct_tri" type="number" step="0.01" value="0" oninput="syncFromPctTri()"></td>
+          <td class="valor"><span class="val-original" id="orig_tri"></span><span class="val-calc green" id="val_tri">—</span></td>
+        </tr>
+        <tr>
+          <td class="desc">Auxílio Transporte</td>
+          <td class="formula">Valor fixo</td>
+          <td class="pct">—</td>
+          <td class="valor"><input class="val-input green" id="aux_transp" type="number" step="0.01" value="100.00" oninput="calc()"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- DESCONTOS -->
+  <div class="section">
+    <div class="section-title red"><span class="dot"></span> Descontos Obrigatórios</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Descrição</th>
+          <th>Fórmula</th>
+          <th>%</th>
+          <th class="right">Valor (R$)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="desc">Fundo de Saúde</td>
+          <td class="formula">Soldo × %</td>
+          <td class="pct"><input class="pct-input" id="pct_saude" type="number" step="0.01" value="10" oninput="syncFromSaude()"></td>
+          <td class="valor"><span class="val-original" id="orig_saude"></span><span class="val-calc red" id="val_saude">—</span></td>
+        </tr>
+        <tr>
+          <td class="desc">Contr. Militar Ativos</td>
+          <td class="formula">(Bruto − Aux.Transp.) × %</td>
+          <td class="pct"><input class="pct-input" id="pct_contr" type="number" step="0.01" value="10.5" oninput="calc()"></td>
+          <td class="valor"><span class="val-original" id="orig_contr"></span><span class="val-calc red" id="val_contr">—</span></td>
+        </tr>
+        <tr>
+          <td class="desc">Imposto de Renda</td>
+          <td class="formula">(Base IRPF × %) − 908,73</td>
+          <td class="pct"><input class="pct-input" id="pct_ir" type="number" step="0.01" value="27.5" oninput="calc()"></td>
+          <td class="valor"><span class="val-original" id="orig_ir"></span><span class="val-calc red" id="val_ir">—</span></td>
+        </tr>
+      </tbody>
+      <tbody id="descontos_extra"></tbody>
+    </table>
+    <div class="add-row">
+      <button type="button" class="btn-add" onclick="addDesconto()">+ Adicionar Desconto</button>
+    </div>
+  </div>
+
+  <!-- BASES -->
+  <div class="section">
+    <div class="section-title" style="color:var(--yellow)"><span class="dot" style="background:var(--yellow)"></span> Bases de Cálculo</div>
+    <div class="base-grid">
+      <div class="base-item">
+        <label>Base IRPF</label>
+        <div class="bval" id="base_irpf">—</div>
+      </div>
+      <div class="base-item">
+        <label>Base Previdência</label>
+        <div class="bval" id="base_prev">—</div>
+      </div>
+      <div class="base-item">
+        <label>Dedução Dependentes</label>
+        <div class="bval" id="ded_dep">—</div>
+      </div>
+      <div class="base-item">
+        <label>Dep. × R$ 189,59</label>
+        <div class="bval" id="info_dep">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOTAIS -->
+  <div class="totals">
+    <div class="total-card ganhos">
+      <div class="total-label">Total de Ganhos</div>
+      <div class="total-value green" id="total_ganhos">—</div>
+    </div>
+    <div class="total-card descontos">
+      <div class="total-label">Total de Descontos</div>
+      <div class="total-value red" id="total_desc">—</div>
+    </div>
+    <div class="total-card liquido">
+      <div class="total-label">Total Líquido</div>
+      <div class="total-value blue" id="total_liq">—</div>
+    </div>
+  </div>
+
+  </div>
+  <!-- FIM conteudo_dados -->
+
+  <!-- SAIBA MAIS -->
+  <details class="info-box" open>
+    <summary><span class="dot"></span> Saiba mais sobre o Simulador <span class="chevron">▾</span></summary>
+    <div class="info-content">
+      <p>
+        Este simulador reproduz, campo a campo, a estrutura de um contracheque militar: cada
+        gratificação é calculada em cascata a partir do Soldo, e os descontos obrigatórios incidem
+        sobre bases diferentes. Abaixo você entende como cada peça se encaixa.
+      </p>
+
+      <h4>1. O que é o Soldo e como ele funciona?</h4>
+      <p class="lead">
+        O Soldo é a remuneração-base do posto/graduação, definida em lei. É sobre ele que quase
+        todas as demais vantagens são calculadas — por isso, ao trocar o Cargo no topo da página,
+        o Soldo muda e todo o restante do contracheque é recalculado automaticamente.
+      </p>
+
+      <h4>2. Quais gratificações compõem a remuneração?</h4>
+      <ul>
+        <li><strong>GRET</strong> — Gratificação de Regime Especial de Trabalho, um percentual fixo sobre o Soldo.</li>
+        <li><strong>GHP</strong> — Gratificação de Habilitação Profissional, também um percentual sobre o Soldo, mas que varia conforme o curso/habilitação do militar (por isso o campo é editável).</li>
+        <li><strong>GRAM</strong> — Gratificação de Risco de Atividade Militar, calculada sobre a soma de Soldo + GHP + GRET.</li>
+        <li><strong>Triênio</strong> — adicional por tempo de serviço, incidindo sobre Soldo + GRET + GHP + GRAM.</li>
+        <li><strong>Auxílio Transporte</strong> — valor fixo, não entra nas bases de cálculo dos demais itens e não sofre reajuste.</li>
+      </ul>
+
+      <h4>3. Como são calculados os descontos obrigatórios?</h4>
+      <ul>
+        <li><strong>Fundo de Saúde</strong> — percentual sobre o Soldo, que aumenta 1 ponto percentual para cada dependente informado.</li>
+        <li><strong>Contribuição Militar</strong> — percentual sobre o total bruto, descontado o Auxílio Transporte.</li>
+        <li><strong>Imposto de Renda</strong> — aplicado sobre a Base IRPF (bruto menos Auxílio Transporte, Fundo de Saúde, Contribuição Militar e a dedução por dependente), seguindo a fórmula (Base × alíquota) − parcela a deduzir.</li>
+      </ul>
+
+      <h4>4. Como funciona o Simulador de Reajuste?</h4>
+      <p class="lead">
+        Ao informar um percentual de aumento, o simulador recalcula o Soldo e, em cascata, todas as
+        gratificações e descontos — mostrando o valor antigo riscado ao lado do novo valor projetado,
+        para você visualizar o impacto real no líquido.
+      </p>
+
+      <h4>5. Por que adicionar dependentes ou descontos extras?</h4>
+      <p class="lead">
+        Cada dependente informado aumenta o percentual do Fundo de Saúde e gera uma dedução na base
+        do Imposto de Renda. Já o botão "+ Adicionar Desconto" permite simular descontos que não são
+        padrão (como pensão, empréstimo consignado ou plano de saúde particular), entrando direto no
+        Total de Descontos e no Total Líquido.
+      </p>
+
+      <p class="lead">
+        Todos os campos de percentual e valor continuam totalmente editáveis — os preenchimentos
+        automáticos (Cargo, Dependentes) são apenas um ponto de partida.
+      </p>
+    </div>
+  </details>
+
+
+</div>
+
+<script>
+  const fmt = v => 'R$ ' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  const DEP_DED = 189.59;
+  const PARCELA = 908.73;
+  const SAUDE_BASE = 10; // % do Fundo de Saúde com 0 dependentes
+
+  const CARGOS = {
+    subtenente_110: { soldo: 1736.74, ghp: 110 },
+    subtenente_80:  { soldo: 1736.74, ghp: 80  },
+    '1sgt_110':     { soldo: 1596.10, ghp: 110 },
+    '1sgt_80':      { soldo: 1596.10, ghp: 80  },
+    '2sgt_110':     { soldo: 1448.93, ghp: 110 },
+    '2sgt_80':      { soldo: 1448.93, ghp: 80  },
+    '3sgt_110':     { soldo: 1318.10, ghp: 110 },
+    '3sgt_80':      { soldo: 1318.10, ghp: 80  },
+    cabo_75:        { soldo: 1141.48, ghp: 75  },
+    soldado_75:     { soldo: 991.03,  ghp: 75  }
+  };
+
+  function toggleReajuste(habilitado) {
+    const ids = ['pct_reajuste', 'pct_tri_extra', 'valor_fixo_extra'];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      el.disabled = !habilitado;
+      if (!habilitado) el.value = 0;
+    });
+    document.getElementById('reajuste_aviso').style.display = habilitado ? 'none' : 'block';
+  }
+
+  function selectCargo() {
+    const chave = document.getElementById('cargo').value;
+    const conteudo = document.getElementById('conteudo_dados');
+    const placeholder = document.getElementById('placeholder_msg');
+    if (!chave) {
+      conteudo.style.display = 'none';
+      placeholder.style.display = 'block';
+      toggleReajuste(false);
+      calc();
+      return;
+    }
+    const dados = CARGOS[chave];
+    if (!dados) return;
+    document.getElementById('soldo').value = dados.soldo.toFixed(2);
+    document.getElementById('pct_ghp').value = dados.ghp.toFixed(2);
+    conteudo.style.display = 'block';
+    placeholder.style.display = 'none';
+    toggleReajuste(true);
+    calc();
+  }
+
+  function addDesconto() {
+    const tbody = document.getElementById('descontos_extra');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="desc"><input class="desc-input" type="text" value="Outro Desconto" placeholder="Descrição"></td>
+      <td class="formula">Valor fixo</td>
+      <td class="pct">—</td>
+      <td class="valor" style="display:flex;align-items:center;gap:6px;justify-content:flex-end;">
+        <input class="val-input red extra-desconto-valor" type="number" step="0.01" value="0" oninput="calc()">
+        <button type="button" class="btn-remove" onclick="removeDesconto(this)" title="Remover">×</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+    calc();
+  }
+
+  function removeDesconto(btn) {
+    const tr = btn.closest('tr');
+    if (tr) tr.remove();
+    calc();
+  }
+
+  function syncFromDep() {
+    const ndep = parseInt(document.getElementById('ndep').value) || 0;
+    document.getElementById('pct_saude').value = (SAUDE_BASE + ndep).toFixed(2);
+    calc();
+  }
+
+  function syncFromSaude() {
+    const pSaude = parseFloat(document.getElementById('pct_saude').value) || 0;
+    const ndep = Math.max(0, Math.round(pSaude - SAUDE_BASE));
+    document.getElementById('ndep').value = ndep;
+    calc();
+  }
+
+  function syncFromTrienio() {
+    const pct = parseFloat(document.getElementById('qtd_trienio').value) || 0;
+    document.getElementById('pct_tri').value = pct.toFixed(2);
+    calc();
+  }
+
+  function syncFromPctTri() {
+    const pTri = parseFloat(document.getElementById('pct_tri').value) || 0;
+    document.getElementById('qtd_trienio').value = pTri;
+    calc();
+  }
+
+  function calcTudo(soldo, pGret, pGhp, pGram, pTri, auxT, pSaude, pContr, ndep, pIR) {
+    const gret  = soldo * pGret / 100;
+    const ghp   = soldo * pGhp / 100;
+    const gram  = (soldo + ghp + gret) * pGram / 100;
+    const tri   = (soldo + gret + ghp + gram) * pTri / 100;
+    const bruto = soldo + gret + ghp + gram + tri + auxT;
+    const saude = soldo * pSaude / 100;
+    const contr = (bruto - auxT) * pContr / 100;
+    const dedDep = ndep * DEP_DED;
+    const baseIR = bruto - auxT - saude - contr - dedDep;
+    const ir     = Math.max(0, baseIR * pIR / 100 - PARCELA);
+    const totalDesc = saude + contr + ir;
+    const liquido   = bruto - totalDesc;
+    return { gret, ghp, gram, tri, bruto, saude, contr, ir, baseIR, totalDesc, liquido, dedDep };
+  }
+
+  function setOrig(id, val, mostrar) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = mostrar ? fmt(val) : '';
+  }
+
+  function calc() {
+    const soldoBase = parseFloat(document.getElementById('soldo').value) || 0;
+    const pGret     = parseFloat(document.getElementById('pct_gret').value) || 0;
+    const pGhp      = parseFloat(document.getElementById('pct_ghp').value) || 0;
+    const pGram     = parseFloat(document.getElementById('pct_gram').value) || 0;
+    const pTri      = parseFloat(document.getElementById('pct_tri').value) || 0;
+    const auxT      = parseFloat(document.getElementById('aux_transp').value) || 0;
+    const pSaude    = parseFloat(document.getElementById('pct_saude').value) || 0;
+    const pContr    = parseFloat(document.getElementById('pct_contr').value) || 0;
+    const ndep      = parseInt(document.getElementById('ndep').value) || 0;
+    const pIR       = parseFloat(document.getElementById('pct_ir').value) || 0;
+    const pReaj     = parseFloat(document.getElementById('pct_reajuste').value) || 0;
+    const pTriExtra = parseFloat(document.getElementById('pct_tri_extra').value) || 0;
+    const valorFixoExtra = parseFloat(document.getElementById('valor_fixo_extra').value) || 0;
+
+    // Valores SEM reajuste (com os percentuais atuais)
+    const orig = calcTudo(soldoBase, pGret, pGhp, pGram, pTri, auxT, pSaude, pContr, ndep, pIR);
+
+    // Valores COM reajuste (soldo aumentado pelo fator) + triênio futuro somado
+    const fator = 1 + pReaj / 100;
+    const soldoReaj = soldoBase * fator;
+    const pTriNovo = pTri + pTriExtra;
+    const novo = calcTudo(soldoReaj, pGret, pGhp, pGram, pTriNovo, auxT, pSaude, pContr, ndep, pIR);
+
+    // Valor fixo em R$: soma direta ao bruto e ao líquido, sem incidir em nada
+    // (não entra na base do IR, não sofre desconto de saúde/contribuição, não é percentual de nada)
+    novo.bruto    += valorFixoExtra;
+    novo.liquido  += valorFixoExtra;
+
+    const temReaj = pReaj > 0 || pTriExtra > 0 || valorFixoExtra > 0;
+
+    // Diferença de aumento (bruto e líquido)
+    const diffBox = document.getElementById('reajuste_diff');
+    if (temReaj) {
+      const diffBruto   = novo.bruto   - orig.bruto;
+      const diffLiquido = novo.liquido - orig.liquido;
+      document.getElementById('diff_bruto').textContent   = '+' + fmt(diffBruto);
+      document.getElementById('diff_liquido').textContent = '+' + fmt(diffLiquido);
+      document.getElementById('diff_bruto_detail').textContent   = fmt(orig.bruto)   + ' → ' + fmt(novo.bruto);
+      document.getElementById('diff_liquido_detail').textContent = fmt(orig.liquido) + ' → ' + fmt(novo.liquido);
+      diffBox.style.display = 'flex';
+    } else {
+      diffBox.style.display = 'none';
+    }
+
+    // Mostrar valores riscados (sem reajuste) só se houver reajuste
+    setOrig('orig_soldo', soldoBase,   temReaj);
+    setOrig('orig_gret',  orig.gret,   temReaj);
+    setOrig('orig_ghp',   orig.ghp,    temReaj);
+    setOrig('orig_gram',  orig.gram,   temReaj);
+    setOrig('orig_tri',   orig.tri,    temReaj);
+    setOrig('orig_saude', orig.saude,  temReaj);
+    setOrig('orig_contr', orig.contr,  temReaj);
+    setOrig('orig_ir',    orig.ir,     temReaj);
+
+    // Colorir soldo
+    document.getElementById('soldo').style.color = temReaj ? 'var(--yellow)' : 'var(--green)';
+
+    // Preencher contracheque com valores finais (com reajuste se houver)
+    const v = temReaj ? novo : orig;
+    const soldoExibido = temReaj ? soldoReaj : soldoBase;
+
+    // Descontos extras adicionados manualmente (não sofrem reajuste)
+    const extraDescontos = Array.from(document.querySelectorAll('.extra-desconto-valor'))
+      .reduce((sum, el) => sum + (parseFloat(el.value) || 0), 0);
+    v.totalDesc += extraDescontos;
+    v.liquido   -= extraDescontos;
+
+    // Atualiza visualmente o soldo no input sem disparar oninput
+    const soldoEl = document.getElementById('soldo');
+    if (temReaj) {
+      soldoEl.setAttribute('data-reaj', soldoReaj.toFixed(2));
+    } else {
+      soldoEl.removeAttribute('data-reaj');
+    }
+
+    document.getElementById('val_gret').textContent  = fmt(v.gret);
+    document.getElementById('val_ghp').textContent   = fmt(v.ghp);
+    document.getElementById('val_gram').textContent  = fmt(v.gram);
+    document.getElementById('val_tri').textContent   = fmt(v.tri);
+    document.getElementById('val_saude').textContent = fmt(v.saude);
+    document.getElementById('val_contr').textContent = fmt(v.contr);
+    document.getElementById('val_ir').textContent    = fmt(v.ir);
+
+    // Bases
+    document.getElementById('base_irpf').textContent = fmt(v.baseIR);
+    document.getElementById('base_prev').textContent = fmt(v.bruto - auxT);
+    document.getElementById('ded_dep').textContent   = fmt(v.dedDep);
+    document.getElementById('info_dep').textContent  = ndep + ' × R$ 189,59';
+
+    // Totais
+    document.getElementById('total_ganhos').textContent = fmt(v.bruto);
+    document.getElementById('total_desc').textContent   = fmt(v.totalDesc);
+    document.getElementById('total_liq').textContent    = fmt(v.liquido);
+
+    // Mostrar soldo reajustado separadamente no orig_soldo e colorir
+    if (temReaj) {
+      // Exibe o novo soldo abaixo do riscado
+      document.getElementById('val_gret').style.color  = 'var(--yellow)';
+      document.getElementById('val_ghp').style.color   = 'var(--yellow)';
+      document.getElementById('val_gram').style.color  = 'var(--yellow)';
+      document.getElementById('val_tri').style.color   = 'var(--yellow)';
+      document.getElementById('val_saude').style.color = 'var(--red)';
+      document.getElementById('val_contr').style.color = 'var(--red)';
+      document.getElementById('val_ir').style.color    = 'var(--red)';
+      document.getElementById('total_ganhos').style.color = 'var(--yellow)';
+      document.getElementById('total_liq').style.color    = 'var(--yellow)';
+    } else {
+      document.getElementById('val_gret').style.color  = 'var(--green)';
+      document.getElementById('val_ghp').style.color   = 'var(--green)';
+      document.getElementById('val_gram').style.color  = 'var(--green)';
+      document.getElementById('val_tri').style.color   = 'var(--green)';
+      document.getElementById('val_saude').style.color = 'var(--red)';
+      document.getElementById('val_contr').style.color = 'var(--red)';
+      document.getElementById('val_ir').style.color    = 'var(--red)';
+      document.getElementById('total_ganhos').style.color = 'var(--green)';
+      document.getElementById('total_liq').style.color    = 'var(--accent2)';
+    }
+  }
+
+  calc();
+</script>
+</body>
+</html>
