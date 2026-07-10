@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador CDI Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f0f6ff; --bg2: #ffffff; --bg3: #e8f0fe;
+  --g: #1a56db; --b: #1e40af; --a: #d97706; --p: #6366f1; --r: #ef4444;
+  --text: #1e293b; --muted: #64748b;
+  --border: rgba(30,64,175,0.12); --card: rgba(255,255,255,0.9);
+  --fd: 'Syne', sans-serif; --fm: 'DM Mono', monospace;
+  --accent-blue: #1a56db; --accent-mid: #3b82f6; --accent-light: #dbeafe;
+}
+body {
+  background: var(--bg); color: var(--text); font-family: var(--fm);
+  min-height: 100vh; padding: 2rem 1.5rem 5rem;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59,130,246,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(99,102,241,0.07) 0%, transparent 50%);
+}
+header { text-align: center; margin-bottom: 2.5rem; }
+.tag { display: inline-block; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent-blue); border: 1px solid rgba(26,86,219,0.3); padding: 4px 14px; border-radius: 100px; margin-bottom: 1rem; background: var(--accent-light); }
+h1 { font-family: var(--fd); font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800; letter-spacing: -0.02em; color: #1e3a8a; }
+h1 span { color: var(--accent-blue); }
+.subtitle { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+.layout { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; gap: 1.5rem; align-items: start; }
+@media (max-width: 780px) { .layout { grid-template-columns: 1fr; } }
+
+.panel { background: #ffffff; border: 1px solid rgba(26,86,219,0.12); border-radius: 20px; padding: 1.6rem; box-shadow: 0 2px 20px rgba(30,64,175,0.08); }
+
+.section-title {
+  font-family: var(--fd); font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #1e40af; margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-blue); }
+
+.field { margin-bottom: 1rem; }
+.field label { display: block; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+.input-wrap { position: relative; }
+.pfx { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--muted); pointer-events: none; z-index: 1; }
+
+input[type="number"], input[type="text"], select {
+  width: 100%; background: #f8faff; border: 1px solid rgba(26,86,219,0.2);
+  border-radius: 10px; color: var(--text); font-family: var(--fm); font-size: 13px;
+  padding: 9px 12px 9px 32px; outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s; -moz-appearance: textfield;
+}
+input[type="text"] { padding-left: 12px; }
+select { padding-left: 12px; cursor: pointer; }
+input::-webkit-inner-spin-button, input::-webkit-outer-spin-button { -webkit-appearance: none; }
+input:focus, select:focus { border-color: rgba(26,86,219,0.6); box-shadow: 0 0 0 3px rgba(26,86,219,0.1); }
+
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.divider { height: 1px; background: rgba(26,86,219,0.1); margin: 1.25rem 0; }
+
+/* IR */
+.ir-tabs { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; }
+.ir-tab { background: #f8faff; border: 1px solid rgba(26,86,219,0.15); border-radius: 8px; padding: 6px 3px; font-family: var(--fm); font-size: 10px; color: var(--muted); cursor: pointer; text-align: center; transition: all 0.15s; line-height: 1.4; }
+.ir-tab:hover { border-color: rgba(26,86,219,0.4); color: var(--text); }
+.ir-tab.active { background: rgba(26,86,219,0.1); border-color: rgba(26,86,219,0.5); color: var(--accent-blue); }
+.ir-tab .big { font-size: 13px; font-weight: 600; display: block; }
+
+/* Extras */
+.extras-empty { font-size: 11px; color: var(--muted); text-align: center; padding: 16px 0; }
+
+.extra-card {
+  display: flex; align-items: center; gap: 10px;
+  background: #f0f6ff; border: 1px solid rgba(26,86,219,0.15);
+  border-radius: 12px; padding: 10px 12px; margin-bottom: 8px;
+  transition: border-color 0.15s;
+}
+.extra-card:hover { border-color: rgba(26,86,219,0.4); }
+.extra-icon { font-size: 18px; flex-shrink: 0; }
+.extra-info { flex: 1; min-width: 0; }
+.extra-desc { font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.extra-when { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.extra-val { font-size: 14px; font-weight: 500; color: var(--p); flex-shrink: 0; }
+.extra-del { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: 6px; color: var(--r); cursor: pointer; font-size: 16px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
+.extra-del:hover { background: rgba(239,68,68,0.25); }
+
+.add-form { background: #f0f6ff; border: 1px dashed rgba(26,86,219,0.3); border-radius: 14px; padding: 14px; }
+.add-form-title { font-size: 11px; color: var(--accent-blue); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+
+.btn-add { width: 100%; margin-top: 8px; background: rgba(26,86,219,0.08); border: 1px solid rgba(26,86,219,0.3); border-radius: 8px; color: var(--accent-blue); font-family: var(--fm); font-size: 12px; padding: 9px; cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em; }
+.btn-add:hover { background: rgba(26,86,219,0.16); }
+
+.btn-calc { width: 100%; margin-top: 1.1rem; background: linear-gradient(135deg, #1a56db 0%, #1e40af 100%); color: #ffffff; border: none; border-radius: 10px; font-family: var(--fd); font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 13px; cursor: pointer; transition: opacity 0.2s, transform 0.15s; box-shadow: 0 4px 14px rgba(26,86,219,0.35); }
+.btn-calc:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* Results */
+.metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1.25rem; }
+@media (max-width: 600px) { .metrics { grid-template-columns: 1fr 1fr; } }
+.metric { background: #f8faff; border: 1px solid rgba(26,86,219,0.1); border-radius: 14px; padding: 14px; transition: transform 0.2s; box-shadow: 0 1px 6px rgba(30,64,175,0.05); }
+.metric:hover { transform: translateY(-2px); }
+.metric.mg { border-color: rgba(26,86,219,0.3); background: #eff6ff; }
+.metric.mb { border-color: rgba(59,130,246,0.25); background: #f0f9ff; }
+.metric.ma { border-color: rgba(245,158,11,0.25); background: #fffbeb; }
+.metric.mp { border-color: rgba(99,102,241,0.25); background: #f5f3ff; }
+.metric-lbl { font-size: 10px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.metric-val { font-family: var(--fd); font-size: 1.2rem; font-weight: 700; line-height: 1.1; }
+.metric.mg .metric-val { color: #1a56db; }
+.metric.mb .metric-val { color: #2563eb; }
+.metric.ma .metric-val { color: var(--a); }
+.metric.mp .metric-val { color: var(--p); }
+.metric-sub { font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+/* boost strip */
+.boost-strip { display: flex; align-items: center; gap: 12px; background: #eff6ff; border: 1px solid rgba(26,86,219,0.2); border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; flex-wrap: wrap; }
+.boost-strip strong { color: #1a56db; }
+.boost-strip span { color: var(--muted); }
+
+.chart-wrap { height: 260px; margin-bottom: 1rem; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }
+.li { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+.ld { width: 8px; height: 8px; border-radius: 50%; }
+
+.tabs-view { display: flex; gap: 6px; margin-bottom: 12px; }
+.tv-btn { background: #f8faff; border: 1px solid rgba(26,86,219,0.15); border-radius: 8px; padding: 6px 14px; font-family: var(--fm); font-size: 11px; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+.tv-btn.active { background: rgba(26,86,219,0.1); border-color: rgba(26,86,219,0.4); color: #1a56db; }
+.vsec { display: none; }
+.vsec.active { display: block; }
+
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 480px; }
+th { text-align: left; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #1e40af; padding: 6px 8px; border-bottom: 1px solid rgba(26,86,219,0.15); white-space: nowrap; background: #f0f6ff; }
+td { padding: 8px 8px; border-bottom: 1px solid rgba(26,86,219,0.06); font-variant-numeric: tabular-nums; white-space: nowrap; color: #1e293b; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(26,86,219,0.04); }
+.cg { color: #1a56db; } .cb { color: #2563eb; } .ca { color: #d97706; } .cp { color: #6366f1; } .cm { color: var(--muted); }
+.badge { display: inline-flex; align-items: center; font-size: 10px; background: #dbeafe; color: #1a56db; border: 1px solid rgba(26,86,219,0.2); border-radius: 100px; padding: 2px 8px; margin-left: 6px; }
+
+/* timeline visual */
+.timeline-vis { display: flex; flex-direction: column; gap: 0; margin-bottom: 16px; }
+.tl-year { display: flex; align-items: flex-start; gap: 12px; }
+.tl-line { display: flex; flex-direction: column; align-items: center; }
+.tl-dot { width: 10px; height: 10px; border-radius: 50%; background: #1a56db; flex-shrink: 0; margin-top: 3px; }
+.tl-dot.has-extra { background: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
+.tl-vline { width: 2px; flex: 1; background: rgba(26,86,219,0.15); min-height: 20px; }
+.tl-content { padding-bottom: 14px; flex: 1; }
+.tl-label { font-size: 12px; font-weight: 500; color: #1e293b; }
+.tl-detail { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+
+/* ── Subcategoria chips ── */
+.cat-block { margin-bottom: 8px; }
+.cat-row-main {
+  display: grid; grid-template-columns: 1fr 70px 90px;
+  align-items: center; gap: 8px;
+  background: #f8faff; border: 1px solid rgba(26,86,219,0.1);
+  border-radius: 10px 10px 0 0; padding: 8px 10px;
+}
+.cat-row-main:only-child { border-radius: 10px; }
+.cat-block:last-child .cat-row-main { border-color: rgba(26,86,219,0.35); background: #eff6ff; }
+.cat-chips {
+  background: #f0f6ff; border: 1px solid rgba(26,86,219,0.1);
+  border-top: none; border-radius: 0 0 10px 10px;
+  padding: 8px 10px; display: flex; flex-wrap: wrap; gap: 5px;
+}
+.chip {
+  position: relative; display: inline-flex; align-items: center; gap: 4px;
+  background: #fff; border: 1px solid rgba(26,86,219,0.2);
+  border-radius: 100px; padding: 3px 10px; font-size: 11px;
+  color: #1e40af; cursor: pointer; transition: all 0.15s;
+  font-family: var(--fm); white-space: nowrap;
+}
+.chip:hover { background: #dbeafe; border-color: rgba(26,86,219,0.5); }
+.chip.chip-red { border-color: rgba(239,68,68,0.25); color: #dc2626; }
+.chip.chip-red:hover { background: #fee2e2; border-color: rgba(239,68,68,0.5); }
+.chip.chip-green { border-color: rgba(22,163,74,0.25); color: #15803d; }
+.chip.chip-green:hover { background: #dcfce7; border-color: rgba(22,163,74,0.5); }
+.chip-icon { font-size: 12px; }
+.chip-tooltip {
+  display: none; position: absolute; bottom: calc(100% + 6px); left: 50%;
+  transform: translateX(-50%); background: #1e3a8a; color: #fff;
+  font-size: 10px; padding: 5px 9px; border-radius: 7px; white-space: nowrap;
+  pointer-events: none; z-index: 99; max-width: 220px; white-space: normal;
+  text-align: center; line-height: 1.4; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.chip-tooltip::after {
+  content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  border: 5px solid transparent; border-top-color: #1e3a8a;
+}
+.chip:hover .chip-tooltip { display: block; }
+.chips-label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); width: 100%; margin-bottom: 2px; }
+/* ── Resgates parciais ── */
+.resgate-card {
+  display: flex; align-items: center; gap: 10px;
+  background: #fff5f5; border: 1px solid rgba(239,68,68,0.18);
+  border-radius: 12px; padding: 10px 12px; margin-bottom: 8px;
+  transition: border-color 0.15s;
+}
+.resgate-card:hover { border-color: rgba(239,68,68,0.35); }
+.resgate-icon { font-size: 18px; flex-shrink: 0; }
+.resgate-info { flex: 1; min-width: 0; }
+.resgate-desc { font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.resgate-when { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.resgate-val { font-size: 14px; font-weight: 500; color: #ef4444; flex-shrink: 0; }
+.resgate-del { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: 6px; color: #ef4444; cursor: pointer; font-size: 16px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
+.resgate-del:hover { background: rgba(239,68,68,0.25); }
+.add-form-red { background: #fff5f5; border: 1px dashed rgba(239,68,68,0.3); border-radius: 14px; padding: 14px; }
+.add-form-red .add-form-title { color: #ef4444; }
+.btn-add-red { width: 100%; margin-top: 8px; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; color: #ef4444; font-family: var(--fm); font-size: 12px; padding: 9px; cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em; }
+.btn-add-red:hover { background: rgba(239,68,68,0.16); }
+.resgate-strip { display: flex; align-items: center; gap: 12px; background: #fff5f5; border: 1px solid rgba(239,68,68,0.2); border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; flex-wrap: wrap; }
+.resgate-strip strong { color: #ef4444; }
+.resgate-strip span { color: var(--muted); }
+
+/* ── Inflação / Poder de Compra ── */
+.inflacao-card {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 1px solid rgba(22,163,74,0.25); border-radius: 16px;
+  padding: 16px; margin-bottom: 14px;
+}
+.inflacao-card-title {
+  font-family: var(--fd); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: #15803d;
+  margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+}
+.inflacao-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+@media (max-width: 600px) { .inflacao-grid { grid-template-columns: 1fr 1fr; } }
+.inf-item { text-align: center; }
+.inf-label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #16a34a; margin-bottom: 4px; }
+.inf-val { font-family: var(--fd); font-size: 1.05rem; font-weight: 700; color: #15803d; }
+.inf-val.nominal { color: #1a56db; }
+.inf-val.real { color: #15803d; }
+.inf-val.perda { color: #dc2626; }
+.inf-sep { width: 1px; background: rgba(22,163,74,0.2); }
+.inf-desc { font-size: 10px; color: #16a34a; margin-top: 3px; }
+.inflacao-bar-wrap { margin-top: 12px; }
+.inflacao-bar-label { font-size: 10px; color: #15803d; margin-bottom: 4px; display: flex; justify-content: space-between; }
+.inflacao-bar-bg { height: 10px; background: rgba(22,163,74,0.15); border-radius: 100px; overflow: hidden; }
+.inflacao-bar-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, #16a34a, #22c55e); transition: width 0.4s ease; }
+.inflacao-nota { font-size: 10px; color: #16a34a; margin-top: 8px; opacity: 0.8; font-style: italic; }
+.tl-extra-tag { display: inline-flex; align-items: center; gap: 4px; background: #ede9fe; border: 1px solid rgba(99,102,241,0.3); border-radius: 6px; padding: 2px 8px; font-size: 11px; color: #4f46e5; margin-top: 4px; margin-right: 4px; }
+
+/* ── Método de aporte ── */
+.metodos-tabs { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
+.metodo-tab {
+  background: #f8faff; border: 1px solid rgba(26,86,219,0.15); border-radius: 10px;
+  padding: 8px 4px; cursor: pointer; text-align: center; transition: all 0.15s;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.metodo-tab:hover { border-color: rgba(26,86,219,0.4); background: #eff6ff; }
+.metodo-tab.active { background: rgba(26,86,219,0.1); border-color: rgba(26,86,219,0.5); }
+.mt-nome { font-family: var(--fd); font-size: 11px; font-weight: 700; color: #1e3a8a; }
+.metodo-tab.active .mt-nome { color: #1a56db; }
+.mt-desc { font-size: 11px; color: var(--muted); }
+.metodo-tab.active .mt-desc { color: #3b82f6; font-weight: 600; }
+.categorias { display: flex; flex-direction: column; gap: 7px; margin: 10px 0; }
+.cat-row {
+  display: grid; grid-template-columns: 1fr 70px 80px;
+  align-items: center; gap: 8px;
+  background: #f8faff; border: 1px solid rgba(26,86,219,0.1);
+  border-radius: 10px; padding: 8px 10px;
+}
+.cat-row:last-child { border-color: rgba(26,86,219,0.35); background: #eff6ff; }
+.cat-nome-input {
+  background: transparent; border: none; border-bottom: 1px dashed rgba(26,86,219,0.25);
+  border-radius: 0; padding: 2px 4px; font-size: 12px; color: var(--text);
+  font-family: var(--fm); width: 100%; outline: none;
+}
+.cat-nome-input:focus { border-bottom-color: #1a56db; box-shadow: none; }
+.cat-pct-wrap { display: flex; align-items: center; gap: 3px; }
+.cat-pct-wrap input { padding: 5px 4px !important; text-align: center; font-size: 12px; }
+.cat-pct-sym { font-size: 11px; color: var(--muted); }
+.cat-val-wrap { display: flex; align-items: center; gap: 3px; }
+.cat-val-wrap input { padding: 5px 4px !important; text-align: center; font-size: 12px; }
+.cat-val-wrap .cat-pct-sym { font-size: 11px; color: var(--muted); }
+.barra-wrap { margin-bottom: 10px; }
+.barra-bg { display: flex; height: 8px; border-radius: 100px; overflow: hidden; background: #e2e8f0; }
+.barra-seg { height: 100%; transition: width 0.3s ease; }
+.aporte-resultado {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 1px solid rgba(26,86,219,0.25); border-radius: 12px;
+  padding: 12px 14px; margin-bottom: 4px;
+}
+.ar-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #3b82f6; margin-bottom: 4px; }
+.ar-val { font-family: var(--fd); font-size: 1.4rem; font-weight: 800; color: #1a56db; }
+.ar-pct { font-family: var(--fd); font-size: 1.8rem; font-weight: 800; color: rgba(26,86,219,0.18); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="tag">Simulador Financeiro</div>
+  <h1>Meu <span>CDI</span> Pro</h1>
+  <p class="subtitle">Simule seu crescimento e adicione entradas extras ao longo do tempo</p>
+</header>
+
+<div class="layout">
+
+<!-- ═══ ESQUERDO ═══ -->
+<div class="panel">
+  <div class="section-title">Base do investimento</div>
+
+  <div class="field">
+    <label>Capital inicial (R$)</label>
+    <div class="input-wrap"><span class="pfx">R$</span>
+    <input type="number" id="capital" value="24000" min="0" step="100"></div>
+  </div>
+
+  <div class="g2">
+    <div class="field">
+      <label style="display:flex;align-items:center;justify-content:space-between">
+        CDI atual (% aa)
+        <span id="cdi-badge" style="font-size:9px;padding:2px 7px;border-radius:100px;background:#dbeafe;color:#1a56db;border:1px solid rgba(26,86,219,0.2);letter-spacing:0.05em;cursor:default">⟳ buscando...</span>
+      </label>
+      <div class="input-wrap"><span class="pfx">%</span>
+      <input type="number" id="cdi" value="13.25" min="0" max="50" step="0.25" style="padding-left:28px"></div>
+    </div>
+    <div class="field">
+      <label>% CDI contratado</label>
+      <div class="input-wrap"><span class="pfx">%</span>
+      <input type="number" id="pct" value="102" min="50" max="200" step="1" style="padding-left:28px"></div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="field">
+      <label>Prazo (anos)</label>
+      <div class="input-wrap"><span class="pfx">⏱</span>
+      <input type="number" id="anos" value="5" min="1" max="30" step="1" style="padding-left:28px"></div>
+    </div>
+    <div class="field">
+      <label>Meta patrimônio</label>
+      <div class="input-wrap"><span class="pfx">R$</span>
+      <input type="number" id="meta" value="0" min="0" step="1000"></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="field">
+      <label>Inflação esperada (% aa)</label>
+      <div class="input-wrap"><span class="pfx">%</span>
+      <input type="number" id="inflacao" value="5" min="0" max="30" step="0.5" style="padding-left:28px"></div>
+    </div>
+    <div class="field">
+      <label style="display:flex;align-items:center;gap:4px">
+        Ganho real
+        <span style="font-size:9px;background:#dbeafe;color:#1a56db;padding:1px 6px;border-radius:100px;border:1px solid rgba(26,86,219,0.2)">CDI − inflação</span>
+      </label>
+      <div class="input-wrap"><span class="pfx">%</span>
+      <input type="number" id="ganho-real-field" value="—" style="padding-left:28px;background:#f0f9ff;color:#1a56db;font-weight:600" readonly></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="section-title">Salário & Método de Aporte</div>
+
+  <!-- Salário -->
+  <div class="field">
+    <label>Salário líquido (R$)</label>
+    <div class="input-wrap"><span class="pfx">R$</span>
+    <input type="number" id="salario" value="2000" min="0" step="100" oninput="recalcAporte()"></div>
+  </div>
+
+  <!-- Seletor de método -->
+  <div class="field">
+    <label>Método de divisão</label>
+    <div class="metodos-tabs" id="metodos-tabs">
+      <button class="metodo-tab active" data-idx="0" onclick="selecionarMetodo(0)">
+        <span class="mt-nome">Básico</span>
+        <span class="mt-desc">50/30/20</span>
+      </button>
+      <button class="metodo-tab" data-idx="1" onclick="selecionarMetodo(1)">
+        <span class="mt-nome">Equilibrado</span>
+        <span class="mt-desc">40/30/30</span>
+      </button>
+      <button class="metodo-tab" data-idx="2" onclick="selecionarMetodo(2)">
+        <span class="mt-nome">Agressivo</span>
+        <span class="mt-desc">40/20/40</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Categorias editáveis -->
+  <div class="categorias" id="categorias"></div>
+
+  <!-- Barra visual de divisão -->
+  <div class="barra-wrap">
+    <div class="barra-bg">
+      <div id="barra-0" class="barra-seg" style="background:#3b82f6"></div>
+      <div id="barra-1" class="barra-seg" style="background:#93c5fd"></div>
+      <div id="barra-2" class="barra-seg" style="background:#1a56db"></div>
+    </div>
+    <div id="barra-total-warn" style="display:none;font-size:10px;color:#ef4444;margin-top:4px;text-align:right">⚠ Total não é 100%</div>
+  </div>
+
+  <!-- Resultado do aporte -->
+  <div class="aporte-resultado" id="aporte-resultado">
+    <div class="ar-left">
+      <div class="ar-label">💰 Valor que vai pro investimento</div>
+      <div class="ar-val" id="ar-val">R$ 0</div>
+    </div>
+    <div class="ar-pct" id="ar-pct">0%</div>
+  </div>
+
+  <div class="g2" style="margin-top:10px">
+    <div class="field" style="margin-bottom:0">
+      <label>Aporte calculado</label>
+      <div class="input-wrap"><span class="pfx">R$</span>
+      <input type="number" id="aporte" value="0" min="0" step="50" style="background:#eff6ff;border-color:rgba(26,86,219,0.3)"></div>
+    </div>
+    <div class="field" style="margin-bottom:0">
+      <label>A partir de</label>
+      <select id="aporte-ini"></select>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="section-title">Entradas extras 💜</div>
+  <p style="font-size:11px;color:var(--muted);margin-bottom:12px">13º, férias, bônus, herança, qualquer grana que você decidir guardar junto.</p>
+
+  <div id="extras-list"></div>
+
+  <div class="add-form">
+    <div class="add-form-title">+ Nova entrada extra</div>
+    <div class="field" style="margin-bottom:8px">
+      <label>O que é?</label>
+      <input type="text" id="ex-desc" placeholder="Ex: 13º salário, Férias, Bônus...">
+    </div>
+    <div class="g2">
+      <div class="field" style="margin-bottom:0">
+        <label>Valor (R$)</label>
+        <div class="input-wrap"><span class="pfx">R$</span>
+        <input type="number" id="ex-val" placeholder="0" min="0" step="100"></div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Quando guardar</label>
+        <select id="ex-quando"></select>
+      </div>
+    </div>
+    <button class="btn-add" onclick="adicionarExtra()">💜 Guardar junto</button>
+  </div>
+
+  <div class="divider"></div>
+  <div class="section-title">Resgates parciais 🔴</div>
+  <p style="font-size:11px;color:var(--muted);margin-bottom:12px">Planeje saques futuros e veja o impacto no patrimônio final.</p>
+
+  <div id="resgates-list"></div>
+
+  <div class="add-form-red">
+    <div class="add-form-title">− Novo resgate parcial</div>
+    <div class="field" style="margin-bottom:8px">
+      <label>Para quê?</label>
+      <input type="text" id="rg-desc" placeholder="Ex: Reforma, Viagem, Emergência...">
+    </div>
+    <div class="g2">
+      <div class="field" style="margin-bottom:0">
+        <label>Valor (R$)</label>
+        <div class="input-wrap"><span class="pfx">R$</span>
+        <input type="number" id="rg-val" placeholder="0" min="0" step="100"></div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Quando resgatar</label>
+        <select id="rg-quando"></select>
+      </div>
+    </div>
+    <button class="btn-add-red" onclick="adicionarResgate()">🔴 Adicionar resgate</button>
+  </div>
+
+  <div class="divider"></div>
+  <div class="section-title">Imposto de renda</div>
+  <div class="ir-tabs">
+    <button class="ir-tab active" data-ir="22.5"><span class="big">22,5%</span>até 180d</button>
+    <button class="ir-tab" data-ir="20"><span class="big">20%</span>até 360d</button>
+    <button class="ir-tab" data-ir="17.5"><span class="big">17,5%</span>até 720d</button>
+    <button class="ir-tab" data-ir="15"><span class="big">15%</span>acima 720d</button>
+  </div>
+
+  <button class="btn-calc" onclick="calcular()">▶ Simular</button>
+</div>
+
+<!-- ═══ DIREITO ═══ -->
+<div class="panel">
+  <div class="section-title">Resultado <span class="badge" id="taxa-ef">—</span></div>
+
+  <div class="metrics">
+    <div class="metric mg">
+      <div class="metric-lbl">Patrimônio bruto</div>
+      <div class="metric-val" id="m-bruto">—</div>
+      <div class="metric-sub">antes do IR</div>
+    </div>
+    <div class="metric mb">
+      <div class="metric-lbl">Patrimônio líquido</div>
+      <div class="metric-val" id="m-liq">—</div>
+      <div class="metric-sub">após IR</div>
+    </div>
+    <div class="metric ma">
+      <div class="metric-lbl">Ganho líquido</div>
+      <div class="metric-val" id="m-ganho">—</div>
+      <div class="metric-sub">rendimento real</div>
+    </div>
+    <div class="metric mp">
+      <div class="metric-lbl">Boost das extras</div>
+      <div class="metric-val" id="m-boost">—</div>
+      <div class="metric-sub">impacto das entradas</div>
+    </div>
+    <div class="metric mb">
+      <div class="metric-lbl">Renda mensal final</div>
+      <div class="metric-val" id="m-mensal">—</div>
+      <div class="metric-sub">rendimento líquido/mês</div>
+    </div>
+    <div class="metric mg" id="meta-card" style="display:none">
+      <div class="metric-lbl">Meta atingida</div>
+      <div class="metric-val" id="m-meta">—</div>
+      <div class="metric-sub">estimativa</div>
+    </div>
+  </div>
+
+
+  <div class="resgate-strip" id="resgate-strip" style="display:none">
+    <span>🔴 Resgates:</span> <strong id="rs-total">—</strong> retirados &bull; impacto no patrimônio: <strong id="rs-impacto">—</strong>
+  </div>
+  <!-- Inflação / Poder de Compra -->
+  <div class="inflacao-card" id="inflacao-card">
+    <div class="inflacao-card-title">🌿 Poder de compra real — o que vale de verdade</div>
+    <div class="inflacao-grid">
+      <div class="inf-item">
+        <div class="inf-label">Valor nominal</div>
+        <div class="inf-val nominal" id="inf-nominal">—</div>
+        <div class="inf-desc">na sua conta</div>
+      </div>
+      <div class="inf-item">
+        <div class="inf-label">Vale hoje em</div>
+        <div class="inf-val real" id="inf-real">—</div>
+        <div class="inf-desc">poder de compra atual</div>
+      </div>
+      <div class="inf-item">
+        <div class="inf-label">Corrosão inflação</div>
+        <div class="inf-val perda" id="inf-perda">—</div>
+        <div class="inf-desc">perdido para inflação</div>
+      </div>
+    </div>
+    <div class="inflacao-bar-wrap">
+      <div class="inflacao-bar-label">
+        <span>Poder de compra preservado</span>
+        <span id="inf-pct-real">—%</span>
+      </div>
+      <div class="inflacao-bar-bg">
+        <div class="inflacao-bar-fill" id="inf-bar" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="inflacao-nota" id="inf-nota">—</div>
+  </div>
+
+  <div class="boost-strip" id="boost-strip" style="display:none">
+    <span>💜 Extras adicionados:</span> <strong id="bs-total">—</strong>
+    <span>·</span>
+    <span>Impacto acumulado:</span> <strong id="bs-boost">—</strong>
+    <span>·</span>
+    <span>Entradas:</span> <strong id="bs-qtd" style="color:#1a56db">—</strong>
+  </div>
+
+  <div class="tabs-view">
+    <button class="tv-btn active" onclick="showTab('timeline',this)">Linha do tempo</button>
+    <button class="tv-btn" onclick="showTab('grafico',this)">Gráfico</button>
+    <button class="tv-btn" onclick="showTab('anual',this)">Tabela anual</button>
+  </div>
+
+  <!-- TIMELINE VIEW -->
+  <div class="vsec active" id="tab-timeline">
+    <div class="timeline-vis" id="timeline-vis"></div>
+  </div>
+
+  <!-- GRAFICO VIEW -->
+  <div class="vsec" id="tab-grafico">
+    <div class="legend">
+      <span class="li"><span class="ld" style="background:#1a56db"></span>Bruto</span>
+      <span class="li"><span class="ld" style="background:#3b82f6"></span>Líquido</span>
+      <span class="li"><span class="ld" style="background:#f59e0b;opacity:.7"></span>Capital</span>
+      <span class="li"><span class="ld" style="background:#6366f1"></span>Extras acum.</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chart"></canvas></div>
+  </div>
+
+  <!-- TABELA ANUAL VIEW -->
+  <div class="vsec" id="tab-anual">
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th>Ano</th><th>Capital total</th><th>Extras acum.</th>
+        <th>Saldo bruto</th><th>Saldo líquido</th><th>Renda/mês</th>
+      </tr></thead>
+      <tbody id="tbody-anual"></tbody>
+    </table>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+let chartInst = null;
+let irAtual = 22.5;
+let extras = [];
+
+// ── Métodos de divisão do salário ──
+const METODOS = [
+  {
+    nome: 'Básico 50/30/20',
+    cats: [
+      { nome: 'Gastos Fixos',      pct: 50, cor: '#3b82f6' },
+      { nome: 'Estilo de Vida',    pct: 30, cor: '#93c5fd' },
+      { nome: 'Investimento 💰',   pct: 20, cor: '#1a56db' },
+    ]
+  },
+  {
+    nome: 'Equilibrado 40/30/30',
+    cats: [
+      { nome: 'Gastos Fixos',      pct: 40, cor: '#3b82f6' },
+      { nome: 'Estilo de Vida',    pct: 30, cor: '#93c5fd' },
+      { nome: 'Investimento 💰',   pct: 30, cor: '#1a56db' },
+    ]
+  },
+  {
+    nome: 'Agressivo 40/20/40',
+    cats: [
+      { nome: 'Gastos Fixos',      pct: 40, cor: '#3b82f6' },
+      { nome: 'Estilo de Vida',    pct: 20, cor: '#93c5fd' },
+      { nome: 'Investimento 💰',   pct: 40, cor: '#1a56db' },
+    ]
+  }
+];
+
+let metodoAtivo = 0;
+// Estado atual das categorias (editável pelo usuário)
+let catsAtual = JSON.parse(JSON.stringify(METODOS[0].cats));
+
+function selecionarMetodo(idx) {
+  metodoAtivo = idx;
+  catsAtual = JSON.parse(JSON.stringify(METODOS[idx].cats));
+  document.querySelectorAll('.metodo-tab').forEach((b,i) => b.classList.toggle('active', i===idx));
+  renderCategorias();
+  recalcAporte();
+}
+
+
+// ── Subcategorias predefinidas por categoria ──
+const SUBCATS = [
+  // Gastos Fixos (idx 0)
+  [
+    { icon:'🏠', label:'Aluguel/Moradia',   tip:'Aluguel, financiamento, condomínio, IPTU' },
+    { icon:'💡', label:'Energia',            tip:'Conta de luz elétrica mensal' },
+    { icon:'💧', label:'Água',               tip:'Conta de água e saneamento' },
+    { icon:'📱', label:'Celular/Internet',   tip:'Plano de celular, internet banda larga' },
+    { icon:'🚌', label:'Transporte fixo',    tip:'Ônibus, metrô, combustível básico, seguro veículo' },
+    { icon:'🏥', label:'Plano de saúde',     tip:'Convênio médico, odontológico' },
+    { icon:'🎓', label:'Educação',           tip:'Mensalidade escola, faculdade, cursos obrigatórios' },
+    { icon:'🛒', label:'Mercado básico',     tip:'Alimentação essencial em casa (não delivery)' },
+    { icon:'💊', label:'Remédios fixos',     tip:'Medicamentos de uso contínuo' },
+    { icon:'📺', label:'Streaming',          tip:'Netflix, Prime, Globoplay e similares' },
+  ],
+  // Estilo de Vida (idx 1)
+  [
+    { icon:'🍔', label:'Delivery/Resto.',    tip:'iFood, Uber Eats, restaurantes, lanches fora' },
+    { icon:'🎬', label:'Lazer',              tip:'Cinema, shows, parques, bares, eventos' },
+    { icon:'👕', label:'Roupas',             tip:'Compras de roupa, calçados, acessórios por vontade' },
+    { icon:'💈', label:'Beleza',             tip:'Salão, barbearia, cosméticos, perfumes' },
+    { icon:'🏋️', label:'Academia',           tip:'Mensalidade de academia, esportes, suplementos' },
+    { icon:'✈️', label:'Viagens',            tip:'Passeios, hospedagem, turismo' },
+    { icon:'🎮', label:'Hobbies',            tip:'Jogos, livros por lazer, cursos opcionais, materiais' },
+    { icon:'🎁', label:'Presentes',          tip:'Aniversários, comemorações, datas especiais' },
+    { icon:'🚗', label:'Uber/Extra',         tip:'Corridas por comodidade, estacionamento, pedágio extra' },
+    { icon:'🐶', label:'Pet',               tip:'Ração, veterinário, banho e tosa do bichinho' },
+  ],
+  // Investimento (idx 2)
+  [
+    { icon:'📈', label:'CDI/CDB',            tip:'Renda fixa como esse simulador — baixo risco' },
+    { icon:'🏦', label:'Tesouro Direto',     tip:'Títulos do governo federal — seguro e acessível' },
+    { icon:'📊', label:'Ações/FIIs',         tip:'Renda variável — bolsa de valores, fundos imobiliários' },
+    { icon:'💰', label:'Reserva Emerg.',     tip:'3 a 6 meses de gastos guardados para imprevistos' },
+    { icon:'🌎', label:'Internacional',      tip:'ETFs e ativos no exterior — dólar, euro' },
+    { icon:'🏠', label:'Imóvel',             tip:'Poupança para entrada de imóvel próprio' },
+  ]
+];
+
+function addChipValue(catIdx, pctSugerido) {
+  // Ao clicar no chip apenas dá foco no input de valor para o usuário editar
+  const el = document.getElementById('cat-val-' + catIdx);
+  if (el) { el.focus(); el.select(); }
+}
+
+function renderCategorias() {
+  const div = document.getElementById('categorias');
+  const sal = parseFloat(document.getElementById('salario')?.value) || 0;
+  div.innerHTML = catsAtual.map((c, i) => {
+    const val = Math.round(sal * c.pct / 100);
+    const chips = (SUBCATS[i] || []).map(s =>
+      `<span class="chip${i===2?' chip-green':''}" onclick="addChipValue(${i})" title="">
+        <span class="chip-icon">${s.icon}</span>${s.label}
+        <span class="chip-tooltip">${s.tip}</span>
+      </span>`
+    ).join('');
+    const isLast = i === catsAtual.length - 1;
+    return `<div class="cat-block">
+      <div class="cat-row-main">
+        <input class="cat-nome-input" value="${c.nome}" oninput="catsAtual[${i}].nome=this.value" placeholder="Nome">
+        <div class="cat-pct-wrap">
+          <input type="number" id="cat-pct-${i}" value="${c.pct}" min="0" max="100" step="1"
+            oninput="onPctChange(${i},this.value)"
+            style="width:46px;padding-left:6px!important">
+          <span class="cat-pct-sym">%</span>
+        </div>
+        <div class="cat-val-wrap">
+          <span class="cat-pct-sym">R$</span>
+          <input type="number" id="cat-val-${i}" value="${val}" min="0" step="10"
+            oninput="onValChange(${i},this.value)"
+            style="width:70px;padding-left:6px!important;${isLast?'color:#1a56db;font-weight:700;border-color:rgba(26,86,219,0.4)':''}">
+        </div>
+      </div>
+      <div class="cat-chips">
+        <span class="chips-label">O que entra aqui 👆 passe o mouse</span>
+        ${chips}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function redistribuir(changed, newPct) {
+  // Índice 0 = Gastos Fixos (âncora quando outros mudam)
+  // Regra:
+  //   - Se mudou índice 0 (Fixos): redistribui o restante entre os outros proporcionalmente
+  //   - Se mudou índice 1 ou 2: ajusta SOMENTE o outro entre 1 e 2, fixos ficam intocados
+  newPct = Math.min(100, Math.max(0, newPct));
+  catsAtual[changed].pct = newPct;
+
+  if (changed === 0) {
+    // Fixos mudaram → redistribui restante entre índices 1 e 2 proporcionalmente
+    const restante = Math.max(0, 100 - newPct);
+    const outros = [1, 2];
+    const somaOutros = outros.reduce((s,i) => s + (parseFloat(catsAtual[i].pct)||0), 0);
+    if (somaOutros > 0) {
+      outros.forEach(i => {
+        catsAtual[i].pct = Math.round((catsAtual[i].pct / somaOutros) * restante * 10) / 10;
+      });
+    } else {
+      catsAtual[1].pct = Math.round(restante / 2 * 10) / 10;
+      catsAtual[2].pct = Math.round(restante / 2 * 10) / 10;
+    }
+  } else {
+    // Estilo de vida ou Investimento mudaram → ajusta SOMENTE o outro, fixos intocados
+    const fixo = parseFloat(catsAtual[0].pct) || 0;
+    const outro = changed === 1 ? 2 : 1;
+    catsAtual[outro].pct = Math.max(0, Math.round((100 - fixo - newPct) * 10) / 10);
+  }
+
+  // Corrige arredondamento final para somar 100
+  const soma = catsAtual.reduce((s,c) => s + (parseFloat(c.pct)||0), 0);
+  const diff = Math.round((100 - soma) * 10) / 10;
+  if (diff !== 0) {
+    // aplica diff no último que não foi alterado
+    const ajuste = changed === 2 ? 1 : 2;
+    catsAtual[ajuste].pct = Math.round((catsAtual[ajuste].pct + diff) * 10) / 10;
+  }
+
+  detectarMetodo();
+}
+
+function detectarMetodo() {
+  // Verifica qual método está mais próximo pelo pct de investimento (última cat)
+  const inv = catsAtual[catsAtual.length-1].pct;
+  const dists = METODOS.map((m,i) => ({ i, d: Math.abs(m.cats[m.cats.length-1].pct - inv) }));
+  dists.sort((a,b) => a.d - b.d);
+  const closest = dists[0].i;
+  metodoAtivo = closest;
+  document.querySelectorAll('.metodo-tab').forEach((b,i) => b.classList.toggle('active', i===closest));
+}
+
+function onPctChange(i, raw) {
+  const pct = Math.min(100, Math.max(0, parseFloat(raw) || 0));
+  redistribuir(i, pct);
+  const sal = parseFloat(document.getElementById('salario')?.value) || 0;
+  const valEl = document.getElementById('cat-val-'+i);
+  if (valEl) valEl.value = Math.round(sal * pct / 100);
+  recalcAporte();
+}
+
+function onValChange(i, raw) {
+  const sal = parseFloat(document.getElementById('salario')?.value) || 0;
+  const val = Math.min(sal, Math.max(0, parseFloat(raw) || 0));
+  const pct = sal > 0 ? Math.round((val / sal) * 1000) / 10 : 0;
+  redistribuir(i, pct);
+  recalcAporte();
+}
+
+function recalcAporte() {
+  const sal = parseFloat(document.getElementById('salario')?.value) || 0;
+  const last = catsAtual.length - 1;
+  const total = catsAtual.reduce((s,c) => s + (parseFloat(c.pct)||0), 0);
+
+  // Atualiza valores e pcts das categorias
+  catsAtual.forEach((c, i) => {
+    const pct = parseFloat(c.pct) || 0;
+    const v = Math.round(sal * pct / 100);
+    const valEl = document.getElementById('cat-val-'+i);
+    const pctEl = document.getElementById('cat-pct-'+i);
+    if (valEl && document.activeElement !== valEl) valEl.value = v;
+    if (pctEl && document.activeElement !== pctEl) pctEl.value = pct;
+  });
+
+  // Barra visual
+  catsAtual.forEach((c, i) => {
+    const seg = document.getElementById('barra-'+i);
+    if (seg) {
+      seg.style.width = Math.max(0, parseFloat(c.pct)||0) + '%';
+      seg.style.background = c.cor || '#3b82f6';
+    }
+  });
+
+  const warn = document.getElementById('barra-total-warn');
+  if (warn) warn.style.display = 'none';
+
+  // Aporte = última categoria (Investimento)
+  const aporteVal = Math.round(sal * (parseFloat(catsAtual[last].pct)||0) / 100);
+  const pctInv = parseFloat(catsAtual[last].pct) || 0;
+
+  const arVal = document.getElementById('ar-val');
+  const arPct = document.getElementById('ar-pct');
+  if (arVal) arVal.textContent = 'R$ ' + aporteVal.toLocaleString('pt-BR');
+  if (arPct) arPct.textContent = pctInv + '%';
+
+  const aporteInput = document.getElementById('aporte');
+  if (aporteInput) { aporteInput.value = aporteVal; }
+
+  calcular();
+}
+
+// ── populate selects ──
+function populateSelects() {
+  const anos = parseInt(document.getElementById('anos').value) || 5;
+  const meses = anos * 12;
+  const selAporte = document.getElementById('aporte-ini');
+  const selEx = document.getElementById('ex-quando');
+  const prevAporte = selAporte.value;
+  const prevEx = selEx.value;
+
+  // Aporte: por ano
+  selAporte.innerHTML = '';
+  for (let a = 1; a <= anos; a++) {
+    const m = (a - 1) * 12 + 1;
+    selAporte.innerHTML += `<option value="${m}" ${m==prevAporte?'selected':''}>Ano ${a}</option>`;
+  }
+  if (!prevAporte) selAporte.value = '1';
+
+  // Extras: só por ano (valor = último mês do ano = ano*12)
+  selEx.innerHTML = '';
+  for (let a = 1; a <= anos; a++) {
+    const mesDoAno = a * 12;
+    selEx.innerHTML += `<option value="${mesDoAno}" ${mesDoAno==prevEx?'selected':''}>Ano ${a}</option>`;
+  }
+  if (!prevEx) selEx.value = '12';
+
+  // Resgates: igual, por ano
+  const selRg = document.getElementById('rg-quando');
+  if (selRg) {
+    const prevRg = selRg.value;
+    selRg.innerHTML = '';
+    for (let a = 1; a <= anos; a++) {
+      const mesDoAno = a * 12;
+      selRg.innerHTML += `<option value="${mesDoAno}" ${mesDoAno==prevRg?'selected':''}>Ano ${a}</option>`;
+    }
+    if (!prevRg) selRg.value = '12';
+  }
+}
+
+document.getElementById('anos').addEventListener('input', () => { populateSelects(); calcular(); });
+document.querySelectorAll('input[type="number"]').forEach(inp => {
+  if (!['ex-val','anos','rg-val'].includes(inp.id)) inp.addEventListener('input', calcular);
+});
+document.querySelectorAll('.ir-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.ir-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    irAtual = parseFloat(btn.dataset.ir);
+    calcular();
+  });
+});
+
+function showTab(id, btn) {
+  document.querySelectorAll('.vsec').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tv-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function fmt(v) { return 'R$ ' + Math.round(v).toLocaleString('pt-BR'); }
+
+function mesLabel(m) {
+  return `Ano ${Math.ceil(m/12)}`;
+}
+
+function adicionarExtra() {
+  const desc = document.getElementById('ex-desc').value.trim() || 'Entrada extra';
+  const val = parseFloat(document.getElementById('ex-val').value) || 0;
+  const mes = parseInt(document.getElementById('ex-quando').value) || 1;
+  if (val <= 0) { alert('Informe um valor maior que zero.'); return; }
+  const icons = ['💰','🎄','🌴','🎯','💎','🏆','✨','🤑'];
+  const icon = icons[extras.length % icons.length];
+  extras.push({ desc, val, mes, id: Date.now(), icon });
+  document.getElementById('ex-desc').value = '';
+  document.getElementById('ex-val').value = '';
+  renderExtras();
+  calcular();
+}
+
+function removerExtra(id) {
+  extras = extras.filter(e => e.id !== id);
+  renderExtras();
+  calcular();
+}
+
+function renderExtras() {
+  const list = document.getElementById('extras-list');
+  if (extras.length === 0) {
+    list.innerHTML = '<p class="extras-empty">Nenhuma entrada extra ainda. Adicione abaixo 👇</p>';
+    return;
+  }
+  const sorted = [...extras].sort((a,b) => a.mes - b.mes);
+  list.innerHTML = sorted.map(e => `
+    <div class="extra-card">
+      <div class="extra-icon">${e.icon}</div>
+      <div class="extra-info">
+        <div class="extra-desc">${e.desc}</div>
+        <div class="extra-when">${mesLabel(e.mes)}</div>
+      </div>
+      <div class="extra-val">${fmt(e.val)}</div>
+      <button class="extra-del" onclick="removerExtra(${e.id})">×</button>
+    </div>
+  `).join('');
+}
+
+function calcular() {
+  const capital = parseFloat(document.getElementById('capital').value) || 0;
+  const cdiBase = parseFloat(document.getElementById('cdi').value) || 0;
+  const pct = parseFloat(document.getElementById('pct').value) || 100;
+  const anos = parseInt(document.getElementById('anos').value) || 5;
+  const aporte = parseFloat(document.getElementById('aporte').value) || 0;
+  const aporteIni = parseInt(document.getElementById('aporte-ini').value) || 1;
+  const meta = parseFloat(document.getElementById('meta').value) || 0;
+  const ir = irAtual / 100;
+  const meses = anos * 12;
+
+  const cdiEf = cdiBase * pct / 100;
+  const txM = Math.pow(1 + cdiEf / 100, 1/12) - 1;
+  document.getElementById('taxa-ef').textContent = cdiEf.toFixed(2) + '% aa efetivo';
+
+  // Resgates por mês
+  const rgMap = {};
+  resgates.forEach(r => { if (!rgMap[r.mes]) rgMap[r.mes] = []; rgMap[r.mes].push(r); });
+
+  // Extras por mês
+  const exMap = {};
+  extras.forEach(e => { if (!exMap[e.mes]) exMap[e.mes] = []; exMap[e.mes].push(e); });
+
+  // Simulação sem extras (para boost)
+  let saldoSem = capital, capSem = capital;
+  for (let m = 1; m <= meses; m++) {
+    saldoSem *= (1 + txM);
+    if (m >= aporteIni && aporte > 0) { saldoSem += aporte; capSem += aporte; }
+  }
+
+  // Simulação principal
+  let saldo = capital, totalCap = capital, totalExtras = 0, metaMes = null;
+  const pBruto=[capital], pLiq=[capital], pCap=[capital], pEx=[0], labels=['Início'];
+  const anoData = []; // para tabela anual e timeline
+
+  // Dados anuais base (mesmo sem extras naquele ano)
+  for (let m = 1; m <= meses; m++) {
+    saldo *= (1 + txM);
+    if (m >= aporteIni && aporte > 0) { saldo += aporte; totalCap += aporte; }
+    if (exMap[m]) exMap[m].forEach(e => { saldo += e.val; totalCap += e.val; totalExtras += e.val; });
+    // Resgates parciais
+    if (rgMap[m]) rgMap[m].forEach(r => {
+      const retirada = Math.min(r.val, saldo);
+      saldo -= retirada;
+      totalCap = Math.max(0, totalCap - retirada);
+    });
+    if (meta > 0 && !metaMes && saldo >= meta) metaMes = m;
+    if (m % 12 === 0) {
+      const rend = saldo - totalCap;
+      const liq = totalCap + rend * (1-ir);
+      const rmLiq = saldo * txM * (1-ir);
+      const ano = m/12;
+      pBruto.push(Math.round(saldo)); pLiq.push(Math.round(liq));
+      pCap.push(Math.round(totalCap)); pEx.push(Math.round(totalExtras));
+      labels.push('Ano '+ano);
+      // extras deste ano
+      const extrasAno = extras.filter(e => e.mes > (m-12) && e.mes <= m);
+      anoData.push({ ano, saldo, liq, totalCap, totalExtras, rmLiq, extrasAno });
+    }
+  }
+
+  // Métricas
+  const rendFinal = saldo - totalCap;
+  const saldoLiq = totalCap + rendFinal*(1-ir);
+  const rmLiq = saldo * txM * (1-ir);
+  const boost = saldo - saldoSem;
+
+  // ── Poder de compra real ──
+  const inflacao = parseFloat(document.getElementById('inflacao')?.value) || 0;
+  const cdiEfVal = cdiEf;
+  const ganhoReal = cdiEfVal - inflacao;
+  const ganhoRealEl = document.getElementById('ganho-real-field');
+  if (ganhoRealEl) ganhoRealEl.value = ganhoReal.toFixed(2);
+
+  // Deflacionar o saldo líquido pelo prazo
+  const fatorInflacao = Math.pow(1 + inflacao / 100, anos);
+  const saldoRealHoje = saldoLiq / fatorInflacao;
+  const perdaInflacao = saldoLiq - saldoRealHoje;
+  const pctPreservado = (saldoRealHoje / saldoLiq) * 100;
+
+  document.getElementById('inf-nominal').textContent = fmt(saldoLiq);
+  document.getElementById('inf-real').textContent = fmt(saldoRealHoje);
+  document.getElementById('inf-perda').textContent = '− ' + fmt(perdaInflacao);
+  document.getElementById('inf-pct-real').textContent = pctPreservado.toFixed(1) + '%';
+  document.getElementById('inf-bar').style.width = Math.max(0, pctPreservado).toFixed(1) + '%';
+
+  // Nota explicativa
+  const nota = inflacao > 0
+    ? `Com inflação de ${inflacao}% ao ano, seus ${fmt(saldoLiq)} nominais equivalem a ${fmt(saldoRealHoje)} de poder de compra de hoje. O ganho real é de ~${ganhoReal.toFixed(1)}% ao ano (CDI ${cdiEfVal.toFixed(1)}% − inflação ${inflacao}%).`
+    : 'Defina uma inflação esperada para ver o poder de compra real do seu patrimônio.';
+  document.getElementById('inf-nota').textContent = nota;
+
+  document.getElementById('m-bruto').textContent = fmt(saldo);
+  document.getElementById('m-liq').textContent = fmt(saldoLiq);
+  document.getElementById('m-ganho').textContent = fmt(saldoLiq - capital);
+  document.getElementById('m-boost').textContent = extras.length > 0 ? fmt(boost) : '—';
+  document.getElementById('m-mensal').textContent = fmt(rmLiq);
+
+  if (meta > 0) {
+    document.getElementById('meta-card').style.display = 'block';
+    document.getElementById('m-meta').textContent = metaMes ? mesLabel(metaMes) : '> '+anos+' anos';
+  } else { document.getElementById('meta-card').style.display = 'none'; }
+
+  // Resgate strip
+  const totalResgates = resgates.reduce((s,r) => s+r.val, 0);
+  if (resgates.length > 0) {
+    // Simula sem resgates para calcular impacto
+    let saldoSemRg = capital; let capSemRg = capital;
+    const txMtmp = txM;
+    for (let m = 1; m <= meses; m++) {
+      saldoSemRg *= (1 + txMtmp);
+      if (m >= aporteIni && aporte > 0) { saldoSemRg += aporte; capSemRg += aporte; }
+      if (exMap[m]) exMap[m].forEach(e => { saldoSemRg += e.val; capSemRg += e.val; });
+    }
+    const impactoRg = saldoSemRg - saldo;
+    document.getElementById('resgate-strip').style.display = 'flex';
+    document.getElementById('rs-total').textContent = 'R$ ' + Math.round(totalResgates).toLocaleString('pt-BR');
+    document.getElementById('rs-impacto').textContent = '− R$ ' + Math.round(impactoRg).toLocaleString('pt-BR');
+  } else {
+    document.getElementById('resgate-strip').style.display = 'none';
+  }
+
+  if (extras.length > 0) {
+    document.getElementById('boost-strip').style.display = 'flex';
+    document.getElementById('bs-total').textContent = fmt(totalExtras);
+    document.getElementById('bs-boost').textContent = fmt(boost);
+    document.getElementById('bs-qtd').textContent = extras.length + ' entrada' + (extras.length>1?'s':'');
+  } else { document.getElementById('boost-strip').style.display = 'none'; }
+
+  // ── TIMELINE ──
+  const tlDiv = document.getElementById('timeline-vis');
+  tlDiv.innerHTML = '';
+  anoData.forEach((d, i) => {
+    const hasExtras = d.extrasAno.length > 0;
+    const extrasHtml = d.extrasAno.map(e =>
+      `<span class="tl-extra-tag">${e.icon} ${e.desc} +${fmt(e.val)}</span>`
+    ).join('');
+    const isLast = i === anoData.length - 1;
+    tlDiv.innerHTML += `
+      <div class="tl-year">
+        <div class="tl-line">
+          <div class="tl-dot ${hasExtras?'has-extra':''}"></div>
+          ${!isLast ? '<div class="tl-vline"></div>' : ''}
+        </div>
+        <div class="tl-content">
+          <div class="tl-label">Ano ${d.ano} — <span style="color:#1a56db">${fmt(d.liq)}</span> líquido</div>
+          <div class="tl-detail">Saldo bruto ${fmt(d.saldo)} · Renda/mês ${fmt(d.rmLiq)} · Capital aportado ${fmt(d.totalCap)}</div>
+          ${hasExtras ? `<div style="margin-top:6px">${extrasHtml}</div>` : ''}
+          ${(() => { const rgsAno = resgates.filter(r => r.mes > (d.ano-1)*12 && r.mes <= d.ano*12); return rgsAno.length > 0 ? '<div style="margin-top:5px">' + rgsAno.map(r => `<span style="display:inline-flex;align-items:center;gap:4px;background:#fff5f5;border:1px solid rgba(239,68,68,0.25);border-radius:6px;padding:2px 8px;font-size:11px;color:#ef4444;margin-top:4px;margin-right:4px">💸 ${r.desc} −R$${Math.round(r.val).toLocaleString('pt-BR')}</span>`).join('') + '</div>' : ''; })()}
+          ${d.totalExtras > 0 ? `<div style="font-size:10px;color:var(--muted);margin-top:3px">Extras acumulados até aqui: <span style="color:var(--p)">${fmt(d.totalExtras)}</span></div>` : ''}
+        </div>
+      </div>`;
+  });
+
+  // ── TABELA ANUAL ──
+  const tba = document.getElementById('tbody-anual');
+  tba.innerHTML = `<tr><td class="cm">Hoje</td><td class="ca">${fmt(capital)}</td><td class="cp">—</td><td>${fmt(capital)}</td><td class="cb">${fmt(capital)}</td><td class="cm">—</td></tr>`;
+  anoData.forEach(d => {
+    tba.innerHTML += `<tr>
+      <td class="cm">Ano ${d.ano}</td>
+      <td class="ca">${fmt(d.totalCap)}</td>
+      <td class="cp">${d.totalExtras>0?fmt(d.totalExtras):'—'}</td>
+      <td class="cg">${fmt(d.saldo)}</td>
+      <td class="cb">${fmt(d.liq)}</td>
+      <td style="color:#1a56db">${fmt(d.rmLiq)}</td>
+    </tr>`;
+  });
+
+  // ── GRÁFICO ──
+  if (chartInst) chartInst.destroy();
+  chartInst = new Chart(document.getElementById('chart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label:'Bruto', data:pBruto, borderColor:'#1a56db', backgroundColor:'rgba(26,86,219,0.06)', borderWidth:2, fill:true, tension:0.35, pointRadius:4, pointBackgroundColor:'#1a56db' },
+        { label:'Líquido', data:pLiq, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.04)', borderWidth:2, fill:true, tension:0.35, pointRadius:4, borderDash:[5,3], pointBackgroundColor:'#3b82f6' },
+        { label:'Capital', data:pCap, borderColor:'rgba(245,158,11,0.5)', borderWidth:1.5, fill:false, tension:0, pointRadius:3, borderDash:[3,4] },
+        { label:'Extras', data:pEx, borderColor:'rgba(99,102,241,0.8)', borderWidth:1.5, fill:false, tension:0.3, pointRadius:3, borderDash:[2,3] },
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins: {
+        legend:{display:false},
+        tooltip:{ backgroundColor:'#1e3a8a', borderColor:'rgba(255,255,255,0.15)', borderWidth:1, titleColor:'#93c5fd', bodyColor:'#f0f6ff', bodyFont:{family:'DM Mono'}, callbacks:{ label: ctx => ' '+ctx.dataset.label+': '+fmt(ctx.parsed.y) } }
+      },
+      scales: {
+        y:{ ticks:{ callback: v => 'R$'+(v>=1e6?(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'k':v), color:'#64748b', font:{size:11,family:'DM Mono'} }, grid:{color:'rgba(26,86,219,0.06)'}, border:{display:false} },
+        x:{ ticks:{color:'#64748b',font:{size:11,family:'DM Mono'}}, grid:{display:false}, border:{display:false} }
+      }
+    }
+  });
+}
+
+
+let resgates = [];
+
+function adicionarResgate() {
+  const desc = document.getElementById('rg-desc').value.trim() || 'Resgate';
+  const val = parseFloat(document.getElementById('rg-val').value) || 0;
+  const mes = parseInt(document.getElementById('rg-quando').value) || 1;
+  if (val <= 0) { alert('Informe um valor maior que zero.'); return; }
+  resgates.push({ desc, val, mes, id: Date.now() });
+  document.getElementById('rg-desc').value = '';
+  document.getElementById('rg-val').value = '';
+  renderResgates();
+  calcular();
+}
+
+function removerResgate(id) {
+  resgates = resgates.filter(r => r.id !== id);
+  renderResgates();
+  calcular();
+}
+
+function renderResgates() {
+  const list = document.getElementById('resgates-list');
+  if (resgates.length === 0) {
+    list.innerHTML = '<p style="font-size:11px;color:var(--muted);text-align:center;padding:12px 0">Nenhum resgate planejado.</p>';
+    return;
+  }
+  const sorted = [...resgates].sort((a,b) => a.mes - b.mes);
+  list.innerHTML = sorted.map(r => `
+    <div class="resgate-card">
+      <div class="resgate-icon">💸</div>
+      <div class="resgate-info">
+        <div class="resgate-desc">${r.desc}</div>
+        <div class="resgate-when">${mesLabel(r.mes)}</div>
+      </div>
+      <div class="resgate-val">− R$ ${Math.round(r.val).toLocaleString('pt-BR')}</div>
+      <button class="resgate-del" onclick="removerResgate(${r.id})">×</button>
+    </div>
+  `).join('');
+}
+populateSelects();
+renderExtras();
+renderResgates();
+renderCategorias();
+recalcAporte();
+
+// ── Busca CDI real via BrasilAPI (gratuito, sem cadastro) ──
+async function buscarCDI() {
+  const badge = document.getElementById('cdi-badge');
+  const input = document.getElementById('cdi');
+  try {
+    // BrasilAPI — taxa Selic/CDI do Bacen, sem CORS
+    const res = await fetch('https://brasilapi.com.br/api/taxas/v1');
+    if (!res.ok) throw new Error('falhou');
+    const taxas = await res.json();
+    // Procura CDI na lista
+    const cdiObj = taxas.find(t => t.nome && t.nome.toUpperCase().includes('CDI'));
+    if (cdiObj && cdiObj.valor) {
+      const valorAnual = parseFloat(cdiObj.valor);
+      input.value = valorAnual.toFixed(2);
+      badge.textContent = '✓ ao vivo';
+      badge.style.background = '#dcfce7';
+      badge.style.color = '#15803d';
+      badge.style.border = '1px solid rgba(21,128,61,0.25)';
+      badge.title = `CDI atualizado via BrasilAPI: ${valorAnual.toFixed(2)}% aa`;
+      calcular();
+    } else {
+      // Tenta endpoint alternativo do Bacen via BrasilAPI
+      const res2 = await fetch('https://brasilapi.com.br/api/bcb/v1/taxas/selic-meta');
+      if (!res2.ok) throw new Error('fallback falhou');
+      const data2 = await res2.json();
+      // Selic meta ≈ CDI (diferença de 0,10%)
+      const selic = parseFloat(data2.valor || data2.taxa || 0);
+      if (selic > 0) {
+        const cdiAprox = Math.max(0, selic - 0.1);
+        input.value = cdiAprox.toFixed(2);
+        badge.textContent = '≈ Selic-0,1%';
+        badge.style.background = '#fef9c3';
+        badge.style.color = '#a16207';
+        badge.style.border = '1px solid rgba(161,98,7,0.25)';
+        badge.title = `CDI aproximado via Selic Meta (${selic}% - 0,1%)`;
+        calcular();
+      } else { throw new Error('sem valor'); }
+    }
+  } catch(e) {
+    // Silencioso — mantém valor padrão editável
+    badge.textContent = '✎ manual';
+    badge.style.background = '#f1f5f9';
+    badge.style.color = '#64748b';
+    badge.style.border = '1px solid #e2e8f0';
+    badge.title = 'Não foi possível buscar automaticamente. Edite o campo manualmente.';
+  }
+}
+
+buscarCDI();
+</script>
+</body>
+</html>
