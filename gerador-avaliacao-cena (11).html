@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avaliação do Cenário · Campo 32</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  --green-deep:   #2e7d52;
+  --green-dark:   #245f3e;
+  --green-mid:    #2e7d52;
+  --green-border: #b2d8c2;
+  --green-light:  #4caf72;
+  --green-pale:   #e8f5ee;
+  --green-accent: #1b5e35;
+  --white:        #ffffff;
+  --text-main:    #1a2e22;
+  --text-sub:     #4a7a5e;
+  --text-dim:     #7aaa90;
+  --red:          #c62828;
+  --amber:        #e65100;
+  --card-bg:      #ffffff;
+  --card-border:  #c8e6d4;
+  --input-bg:     #f4fbf7;
+  --input-border: #b2d8c2;
+  --radius:       10px;
+  --radius-sm:    6px;
+  --font:         'Open Sans', system-ui, sans-serif;
+  --shadow:       0 2px 12px rgba(46,125,82,.10);
+}
+
+html { background: #ffffff; }
+
+body {
+  font-family: var(--font);
+  background: #ffffff;
+  color: var(--text-main);
+  min-height: 100vh;
+  padding: 0 0 80px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── TOPO ─────────────────────────────────────────────────────── */
+.topbar {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 0 20px;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0;
+}
+.topbar-brand .icon {
+  width: 32px; height: 32px;
+  background: var(--green-accent);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.topbar-brand h1 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+.topbar-brand p {
+  font-size: 10px;
+  color: var(--text-sub);
+  font-weight: 400;
+  margin-top: 1px;
+}
+.topbar-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 0;
+  margin-left: auto;
+}
+.topbar-field span {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+.topbar-field strong {
+  background: var(--green-mid);
+  border: 1px solid var(--green-border);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  color: var(--green-accent);
+  font-family: monospace;
+}
+
+/* ── LAYOUT ───────────────────────────────────────────────────── */
+.page {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 0 12px calc(60px + 70vh);
+}
+
+/* ── SEÇÕES  ───────────────────────────────────────────────────── */
+.section {
+  background: #f4f5f7;
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 0;
+  scroll-margin-top: var(--sticky-offset, 320px);
+  overflow: hidden;
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 18px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid transparent;
+  transition: background .15s, color .15s;
+}
+.section-head:hover { background: var(--green-accent); }
+.section-head:hover .sec-title,
+.section-head:hover .sec-arrow { color: #ffffff; }
+.section-head.open { border-bottom-color: var(--card-border); }
+.sec-badge { display: none; }
+
+/* ── GRUPOS DO CAMPO 01 ───────────────────────────────────────── */
+.group-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.group-row:last-child { margin-bottom: 0; }
+.group-label-top {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+.sec-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+  flex: 1;
+}
+.sec-arrow {
+  color: var(--text-dim);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1;
+  transition: transform .2s, color .15s;
+  flex-shrink: 0;
+}
+.section-head.open .sec-arrow { transform: rotate(45deg); }
+.section-body {
+  display: none;
+  padding: 16px;
+  flex-direction: column;
+  gap: 14px;
+}
+.section-body.open { display: flex; }
+
+/* checkboxes removidos - campo 01 usa multiselect */
+
+/* ── DROPDOWN MULTI ───────────────────────────────────────────── */
+.dropdown-multi { position: relative; }
+.dropdown-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color .15s;
+}
+.dropdown-trigger:hover { border-color: var(--green-accent); }
+.dropdown-trigger span { font-size: 13px; color: var(--text-main); }
+#dropdown-label { flex: 1; color: var(--text-dim); }
+#dropdown-label.has-items { color: var(--text-main); }
+.dropdown-arrow { font-size: 10px; color: var(--text-dim); transition: transform .2s; flex-shrink: 0; }
+.dropdown-arrow.open { transform: rotate(180deg); }
+
+.dropdown-list {
+  display: none;
+  position: absolute;
+  background: #fff;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgba(46,125,82,.22);
+  z-index: 99999;
+  max-height: 220px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  min-width: 240px;
+}
+.dropdown-list.open { display: block; }
+
+
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f7f3;
+  transition: background .1s;
+  font-size: 13px;
+  color: var(--text-main);
+}
+.dropdown-option:last-child { border-bottom: none; }
+.dropdown-option:hover { background: #e8f5ee; }
+.dropdown-option.selected { background: #e8f5ee; }
+.dropdown-chk {
+  width: 16px; height: 16px;
+  border: 2px solid var(--green-border);
+  border-radius: 4px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: #fff;
+  transition: all .12s;
+}
+.dropdown-option.selected .dropdown-chk {
+  background: #245f3e;
+  border-color: #245f3e;
+}
+.dropdown-option.selected .dropdown-chk::after {
+  content: '';
+  display: block;
+  width: 8px; height: 5px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg) translateY(-1px);
+}
+
+/* tags dos selecionados */
+.selected-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+  min-height: 0;
+}
+.sel-tag {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #245f3e;
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 10px 3px 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.sel-tag button {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,.7);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+.sel-tag button:hover { color: #fff; }
+
+/* ── DROPDOWNS ────────────────────────────────────────────────── */
+.field-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 5px;
+}
+select {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 9px 32px 9px 12px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23567060' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+select:focus { outline: none; border-color: var(--green-accent); }
+select option { background: #f4fbf7; color: var(--text-main); }
+
+
+/* ── CARD VEÍCULO / VÍTIMA ────────────────────────────────────── */
+.item-card {
+  background: #f4fbf7;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.item-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.item-card-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green-accent);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.item-card-title.vit { color: var(--amber); }
+.item-card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+@media (max-width: 500px) { .item-card-grid { grid-template-columns: 1fr; } }
+.item-card-full { grid-column: 1 / -1; }
+
+.btn-rm {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--text-dim);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 9px;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .15s;
+}
+.btn-rm:hover { border-color: var(--red); color: var(--red); }
+
+/* ── BOTÃO ADICIONAR ──────────────────────────────────────────── */
+.btn-add {
+  width: 100%;
+  background: transparent;
+  border: 1px dashed var(--green-border);
+  color: var(--text-sub);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.btn-add:hover { border-color: var(--green-accent); color: var(--green-accent); background: rgba(76,175,114,.05); }
+.btn-add.vit:hover { border-color: var(--amber); color: var(--amber); background: rgba(224,168,50,.05); }
+
+/* ── TEXTAREA ─────────────────────────────────────────────────── */
+textarea {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  color: var(--text-main);
+  font-family: var(--font);
+  font-size: 13px;
+  resize: vertical;
+  min-height: 70px;
+  transition: border-color .15s;
+}
+textarea:focus { outline: none; border-color: var(--green-accent); }
+textarea::placeholder { color: var(--text-dim); }
+
+/* ── PREVIEW (coluna direita) ─────────────────────────────────── */
+.preview-fixed {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 0 12px;
+  padding-bottom: 8px;
+}
+.preview-card {
+  background: #fff;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(46,125,82,.15);
+}
+.preview-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #245f3e;
+  border-bottom: 1px solid #1a4a2e;
+}
+.preview-top-left { display: flex; flex-direction: column; gap: 1px; }
+.preview-top-left span {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: #c4cbc7;
+}
+.preview-top-left small { font-size: 9px; color: #7aaa90; }
+.preview-status { font-size: 9px; color: #7aaa90; font-family: monospace; }
+.preview-text {
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.8;
+  min-height: 60px;
+  max-height: 160px;
+  overflow-y: auto;
+  color: #1a2e22;
+  font-weight: 400;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: #fff;
+}
+.preview-text em { color: #7aaa90; font-style: italic; font-size: 12px; }
+.preview-chars {
+  font-size: 9px;
+  color: var(--text-dim);
+  font-family: monospace;
+  text-align: right;
+  padding: 0 16px 8px;
+}
+.preview-footer {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--card-border);
+  background: #f4fbf7;
+}
+.btn-copy {
+  flex: 1;
+  background: var(--green-accent);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .15s;
+  letter-spacing: .01em;
+}
+.btn-copy:hover { background: #5dc882; }
+.btn-copy.ok { background: #3a9e5c; color: #fff; }
+.btn-clear {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--text-dim);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .15s;
+}
+.btn-clear:hover { border-color: var(--red); color: var(--red); }
+
+/* ── BOX NO CABEÇALHO DO TOPO ──────────────────────────────────── */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #ffffff;
+  padding-top: 12px;
+}
+.topbar-box {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 0 12px 10px;
+}
+
+/* ── DIVISOR INTERNO ──────────────────────────────────────────── */
+.inner-div {
+  height: 1px;
+  background: var(--card-border);
+  margin: 2px 0;
+}
+</style>
+</head>
+<body>
+
+<div class="sticky-header">
+<div class="topbar-box">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="icon">🚑</div>
+      <div>
+        <h1>Avaliação do Cenário</h1>
+        <p>Gerador de texto para relatório de ocorrência</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PREVIEW FIXO ABAIXO DO TOPBAR -->
+<div class="preview-fixed">
+  <div class="preview-card">
+    <div class="preview-top">
+      <div class="preview-top-left">
+        <span>Texto gerado</span>
+      </div>
+      <span class="preview-status" id="pstatus">aguardando…</span>
+    </div>
+    <div class="preview-text" id="ptext"><em>Preencha os campos abaixo para gerar o texto do relatório.</em></div>
+    <div class="preview-chars" id="pchars"></div>
+    <div class="preview-footer">
+      <button class="btn-copy" id="copyBtn" onclick="copyText()">Copiar para relatório</button>
+      <button class="btn-clear" onclick="clearAll()">Limpar</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- FORMULÁRIO ROLA ABAIXO -->
+<div class="page">
+
+    <!-- 01 · Cena -->
+    <div class="section" id="s1">
+      <div class="section-head" onclick="toggleSec('s1')">
+        <span class="sec-title">Situação encontrada na chegada</span>
+        <span class="sec-arrow">+</span>
+      </div>
+      <div class="section-body" id="sb1">
+        <div class="group-row">
+          <div class="group-label-top">Status da cena</div>
+          <div class="dropdown-multi" id="dd-status">
+            <div class="dropdown-trigger" onclick="toggleDD('status')">
+              <span class="dd-label" id="lbl-status">Selecione uma ou mais opções...</span>
+              <span class="dropdown-arrow" id="arr-status">▼</span>
+            </div>
+            <div class="dropdown-list" id="list-status"></div>
+          </div>
+          <div class="selected-tags" id="tags-status"></div>
+        </div>
+        <div class="group-row">
+          <div class="group-label-top">Populares</div>
+          <div class="dropdown-multi" id="dd-pop">
+            <div class="dropdown-trigger" onclick="toggleDD('pop')">
+              <span class="dd-label" id="lbl-pop">Selecione uma ou mais opções...</span>
+              <span class="dropdown-arrow" id="arr-pop">▼</span>
+            </div>
+            <div class="dropdown-list" id="list-pop"></div>
+          </div>
+          <div class="selected-tags" id="tags-pop"></div>
+        </div>
+        <div class="group-row">
+          <div class="group-label-top">Forças no local</div>
+          <div class="dropdown-multi" id="dd-forcas">
+            <div class="dropdown-trigger" onclick="toggleDD('forcas')">
+              <span class="dd-label" id="lbl-forcas">Selecione uma ou mais opções...</span>
+              <span class="dropdown-arrow" id="arr-forcas">▼</span>
+            </div>
+            <div class="dropdown-list" id="list-forcas"></div>
+          </div>
+          <div class="selected-tags" id="tags-forcas"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02 · Veículos -->
+    <div class="section" id="s2">
+      <div class="section-head" onclick="toggleSec('s2')">
+        <span class="sec-title">Veículos envolvidos</span>
+        <span class="sec-arrow">+</span>
+      </div>
+      <div class="section-body" id="sb2">
+        <div id="v-container"></div>
+        <button class="btn-add" onclick="addVeiculo()">＋ Adicionar veículo</button>
+      </div>
+    </div>
+
+    <!-- 03 · Vítimas -->
+    <div class="section" id="s3">
+      <div class="section-head" onclick="toggleSec('s3')">
+        <span class="sec-title">Vítimas</span>
+        <span class="sec-arrow">+</span>
+      </div>
+      <div class="section-body" id="sb3">
+        <div id="vit-container"></div>
+        <button class="btn-add vit" onclick="addVitima()">＋ Adicionar vítima</button>
+      </div>
+    </div>
+
+    <!-- 04 · Complemento -->
+    <div class="section" id="s4">
+      <div class="section-head" onclick="toggleSec('s4')">
+        <span class="sec-title">Complemento livre</span>
+        <span class="sec-arrow">+</span>
+      </div>
+      <div class="section-body" id="sb4">
+        <textarea id="ta-comp" placeholder="Descreva algum detalhe adicional relevante da cena…" oninput="ST.complemento=this.value;render()"></textarea>
+      </div>
+    </div>
+
+</div>
+
+<script>
+// ── DADOS ──────────────────────────────────────────────────────────────────
+
+const CENA_GRUPOS = {
+  'status': [
+    { key:'andamento',   label:'Cena em andamento'     },
+    { key:'estabilizada',label:'Cena estabilizada'     },
+    { key:'segura',      label:'Cena segura'           },
+    { key:'incendio',    label:'Risco de incêndio'     },
+    { key:'vazamento',   label:'Vazamento de fluidos'  },
+  ],
+  'pop': [
+    { key:'pop_redor',   label:'Populares ao redor'          },
+    { key:'pop_acionou', label:'Popular acionou socorro'      },
+    { key:'pop_aux',     label:'Populares auxiliaram'         },
+    { key:'pop_moveu',   label:'Populares moveram a vítima'   },
+    { key:'sem_test',    label:'Sem testemunhas'              },
+  ],
+  'forcas': [
+    { key:'samu',        label:'SAMU no local'               },
+    { key:'amb',         label:'Ambulância no local'         },
+    { key:'pmerj',       label:'PMERJ no local'              },
+    { key:'pccivil',     label:'Polícia Civil no local'      },
+  ],
+};
+
+const TIPOS_V = [
+  { id:'automovel',   l:'Automóvel',      art:'um veículo automóvel', gen:'m' },
+  { id:'moto',        l:'Motocicleta',    art:'uma motocicleta',      gen:'f' },
+  { id:'caminhao',    l:'Caminhão',       art:'um caminhão',          gen:'m' },
+  { id:'onibus',      l:'Ônibus',         art:'um ônibus',            gen:'m' },
+  { id:'van',         l:'Van/Utilitário', art:'uma van',              gen:'f' },
+  { id:'bicicleta',   l:'Bicicleta',      art:'uma bicicleta',        gen:'f' },
+  { id:'caminhonete', l:'Caminhonete',    art:'uma caminhonete',      gen:'f' },
+  { id:'triciclo',    l:'Triciclo',       art:'um triciclo',          gen:'m' },
+];
+
+const POSICOES_V = [
+  { id:'faixa_dir',   l:'Faixa direita',         tf:'parada na faixa da direita da via',   tm:'parado na faixa da direita da via'   },
+  { id:'faixa_esq',   l:'Faixa esquerda',        tf:'parada na faixa da esquerda da via',  tm:'parado na faixa da esquerda da via'  },
+  { id:'calcada',     l:'Sobre a calçada',        tf:'sobre a calçada',                     tm:'sobre a calçada'                     },
+  { id:'canteiro',    l:'No canteiro central',    tf:'no canteiro central',                 tm:'no canteiro central'                 },
+  { id:'acostamento', l:'No acostamento',         tf:'no acostamento da via',               tm:'no acostamento da via'               },
+  { id:'diagonal',    l:'Diagonal na via',        tf:'posicionada diagonalmente na pista',  tm:'posicionado diagonalmente na pista'  },
+  { id:'capotado',    l:'Capotado/a',             tf:'capotada na via',                     tm:'capotado na via'                     },
+  { id:'tombado',     l:'Tombado/caído',          tf:'tombada na via',                      tm:'tombado na via'                      },
+  { id:'barranco',    l:'Fora da pista/barranco', tf:'fora da pista em barranco',           tm:'fora da pista em barranco'           },
+  { id:'poste',       l:'Contra estrutura fixa',  tf:'colidida contra estrutura fixa',      tm:'colidido contra estrutura fixa'      },
+  { id:'meio_fio',    l:'Sobre o meio-fio',       tf:'sobre o meio-fio',                    tm:'sobre o meio-fio'                    },
+];
+
+const LOCAL_VIT = [
+  { key:'via',       label:'Via pública / asfalto',  txt:'sobre a via pública'                      },
+  { key:'acost',     label:'Acostamento',             txt:'no acostamento, fora da pista'            },
+  { key:'interior',  label:'Interior do veículo',    txt:'no interior do veículo'                   },
+  { key:'projetada', label:'Projetada do veículo',   txt:'projetada para fora do veículo pelo impacto' },
+  { key:'sob',       label:'Sob o veículo',           txt:'parcialmente sob o veículo'               },
+  { key:'canteiro',  label:'Canteiro / gramado',      txt:'no canteiro central'                      },
+  { key:'calcada',   label:'Calçada / passeio',       txt:'sobre a calçada'                          },
+];
+
+const ESTADO_VIT = [
+  { key:'consciente',  label:'Consciente e responsiva',       txt:'consciente e responsiva ao contato verbal'          },
+  { key:'agitada',     label:'Consciente, agitada',           txt:'consciente, porém agitada e não colaborativa'        },
+  { key:'rebaixada',   label:'Rebaixamento de consciência',   txt:'com rebaixamento do nível de consciência'            },
+  { key:'incons_resp', label:'Inconsciente c/ respiração',    txt:'inconsciente, com movimentos respiratórios presentes'},
+  { key:'incons_sem',  label:'Inconsciente s/ respiração',    txt:'inconsciente e sem respiração aparente'              },
+  { key:'pcr',         label:'Em PCR',                        txt:'em parada cardiorrespiratória'                       },
+];
+
+const POSICAO_VIT = [
+  { key:'dorsal',  label:'Decúbito dorsal',   txt:'em decúbito dorsal'  },
+  { key:'ventral', label:'Decúbito ventral',  txt:'em decúbito ventral' },
+  { key:'lateral', label:'Decúbito lateral',  txt:'em decúbito lateral' },
+  { key:'sentada', label:'Sentada',           txt:'em posição sentada'  },
+  { key:'pe',      label:'Em pé',             txt:'em posição ortostática' },
+  { key:'presa',   label:'Aprisionada',       txt:'aprisionada no veículo, com necessidade de desencarceramento' },
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+const ST = {
+  cena: new Set(),
+  veiculos: [],
+  vitimas: [],
+  complemento: '',
+};
+let vcnt = 0, vitcnt = 0;
+
+// ── BUILD 3 DROPDOWNS DE CENA ─────────────────────────────────────────────
+Object.entries(CENA_GRUPOS).forEach(([gid, items]) => {
+  const list = document.getElementById('list-' + gid);
+  items.forEach(item => {
+    const opt = document.createElement('div');
+    opt.className = 'dropdown-option';
+    opt.dataset.key = item.key;
+    opt.dataset.gid = gid;
+    opt.innerHTML = `<div class="dropdown-chk"></div><span>${item.label}</span>`;
+    opt.onclick = (e) => {
+      e.stopPropagation();
+      ST.cena.has(item.key) ? ST.cena.delete(item.key) : ST.cena.add(item.key);
+      opt.classList.toggle('selected', ST.cena.has(item.key));
+      updateGroupTags(gid);
+      render();
+    };
+    list.appendChild(opt);
+  });
+});
+
+// Move todas as listas para o body para escapar de qualquer stacking context
+['status','pop','forcas'].forEach(gid => {
+  const list = document.getElementById('list-' + gid);
+  document.body.appendChild(list);
+});
+
+function toggleDD(gid) {
+  const list    = document.getElementById('list-' + gid);
+  const arrow   = document.getElementById('arr-'  + gid);
+  const trigger = document.querySelector('#dd-'   + gid + ' .dropdown-trigger');
+  const opening = !list.classList.contains('open');
+
+  // fecha todos
+  ['status','pop','forcas'].forEach(g => {
+    document.getElementById('list-' + g).classList.remove('open');
+    document.getElementById('arr-'  + g).classList.remove('open');
+  });
+
+  if (opening) {
+    const rect = trigger.getBoundingClientRect();
+    list.style.top   = (rect.bottom + window.scrollY + 4) + 'px';
+    list.style.left  = rect.left + 'px';
+    list.style.width = rect.width + 'px';
+    list.style.position = 'absolute';
+    list.classList.add('open');
+    arrow.classList.add('open');
+  }
+}
+
+// fecha ao clicar fora
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.dropdown-multi') && !e.target.closest('.dropdown-list')) {
+    closeAllDD();
+  }
+});
+
+// fecha ao scrollar fora da lista
+window.addEventListener('scroll', (e) => {
+  if (!e.target.closest || !e.target.closest('.dropdown-list')) {
+    closeAllDD();
+  }
+}, true);
+
+function closeAllDD() {
+  ['status','pop','forcas'].forEach(g => {
+    document.getElementById('list-' + g).classList.remove('open');
+    document.getElementById('arr-'  + g).classList.remove('open');
+  });
+}
+
+function updateGroupTags(gid) {
+  const tags = document.getElementById('tags-' + gid);
+  const lbl  = document.getElementById('lbl-' + gid);
+  const items = CENA_GRUPOS[gid];
+  tags.innerHTML = '';
+  const sel = items.filter(i => ST.cena.has(i.key));
+  sel.forEach(item => {
+    const tag = document.createElement('div');
+    tag.className = 'sel-tag';
+    tag.innerHTML = `<span>${item.label}</span><button onclick="removeTag('${item.key}','${gid}')">×</button>`;
+    tags.appendChild(tag);
+  });
+  lbl.textContent = sel.length > 0 ? sel.length + ' selecionado(s)' : 'Selecione uma ou mais opções...';
+  lbl.style.color = sel.length > 0 ? 'var(--text-main)' : '';
+}
+
+function removeTag(key, gid) {
+  ST.cena.delete(key);
+  const opt = document.querySelector(`#list-${gid} [data-key="${key}"]`);
+  if (opt) opt.classList.remove('selected');
+  updateGroupTags(gid);
+  render();
+}
+
+function onCenaChange() {}
+
+// ── TOGGLE SEÇÃO — accordion: abre um, fecha os outros ───────────────────
+const ALL_SECS = ['s1','s2','s3','s4'];
+function toggleSec(id) {
+  const isOpen = document.getElementById('sb' + id.slice(1)).classList.contains('open');
+  // fecha todos
+  ALL_SECS.forEach(sid => {
+    document.getElementById('sb' + sid.slice(1)).classList.remove('open');
+    document.querySelector('#' + sid + ' .section-head').classList.remove('open');
+  });
+  // se estava fechado, abre o clicado e scrola para ele
+  if (!isOpen) {
+    document.getElementById('sb' + id.slice(1)).classList.add('open');
+    document.querySelector('#' + id + ' .section-head').classList.add('open');
+    const el = document.getElementById(id);
+    const header = document.querySelector('.sticky-header');
+    requestAnimationFrame(() => {
+      const headerBottom = header ? header.getBoundingClientRect().bottom : 0;
+      const elTop = el.getBoundingClientRect().top;
+      const delta = elTop - headerBottom - 8;
+      window.scrollBy(0, delta);
+    });
+  }
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+function mkSelect(opts, placeholder, val, onChange) {
+  const sel = document.createElement('select');
+  const def = document.createElement('option');
+  def.value = ''; def.textContent = placeholder;
+  sel.appendChild(def);
+  opts.forEach(o => {
+    const op = document.createElement('option');
+    op.value = o.id || o.key;
+    op.textContent = o.l || o.label;
+    if (val === (o.id || o.key)) op.selected = true;
+    sel.appendChild(op);
+  });
+  sel.onchange = () => { onChange(sel.value || null); render(); };
+  return sel;
+}
+
+function fieldWrap(label, el) {
+  const w = document.createElement('div');
+  const lb = document.createElement('div'); lb.className = 'field-label'; lb.textContent = label;
+  w.appendChild(lb); w.appendChild(el);
+  return w;
+}
+
+// ── VEÍCULOS ──────────────────────────────────────────────────────────────
+function addVeiculo() {
+  const v = { id: vcnt++, tipo: null, posicao: null };
+  ST.veiculos.push(v);
+  renderCardVeiculo(v);
+}
+
+function renderCardVeiculo(v) {
+  const c = document.getElementById('v-container');
+  const card = document.createElement('div');
+  card.className = 'item-card';
+  card.id = `vc-${v.id}`;
+
+  const head = document.createElement('div'); head.className = 'item-card-head';
+  const title = document.createElement('span');
+  title.className = 'item-card-title';
+  title.id = `vc-title-${v.id}`;
+  title.textContent = `Veículo ${ST.veiculos.indexOf(v) + 1}`;
+  const rm = document.createElement('button'); rm.className = 'btn-rm'; rm.textContent = 'remover';
+  rm.onclick = () => {
+    ST.veiculos = ST.veiculos.filter(x => x.id !== v.id);
+    card.remove();
+    renumberCards('v-container', 'vc-title-', ST.veiculos, 'Veículo');
+    render();
+  };
+  head.appendChild(title); head.appendChild(rm);
+
+  const grid = document.createElement('div'); grid.className = 'item-card-grid';
+
+  const selTipo = mkSelect(TIPOS_V, 'Selecione o tipo…', v.tipo, val => {
+    v.tipo = val;
+    title.textContent = `Veículo ${ST.veiculos.indexOf(v)+1}${val ? ' · ' + TIPOS_V.find(t=>t.id===val)?.l : ''}`;
+  });
+  const selPos = mkSelect(POSICOES_V, 'Selecione a posição…', v.posicao, val => { v.posicao = val; });
+
+  grid.appendChild(fieldWrap('Tipo de veículo', selTipo));
+  grid.appendChild(fieldWrap('Posição na cena', selPos));
+
+  card.appendChild(head);
+  card.appendChild(grid);
+  c.appendChild(card);
+}
+
+// ── VÍTIMAS ───────────────────────────────────────────────────────────────
+function addVitima() {
+  const vit = { id: vitcnt++, local: null, posicao: null, estado: null };
+  ST.vitimas.push(vit);
+  renderCardVitima(vit);
+}
+
+function renderCardVitima(vit) {
+  const ords = ['Primeira','Segunda','Terceira','Quarta','Quinta','Sexta','Sétima','Oitava','Nona','Décima'];
+  const c = document.getElementById('vit-container');
+  const card = document.createElement('div');
+  card.className = 'item-card';
+  card.id = `vitc-${vit.id}`;
+
+  const head = document.createElement('div'); head.className = 'item-card-head';
+  const title = document.createElement('span');
+  title.className = 'item-card-title vit';
+  title.id = `vit-title-${vit.id}`;
+  const idx = ST.vitimas.indexOf(vit);
+  title.textContent = `${ords[idx] || (idx+1)+'ª'} Vítima`;
+  const rm = document.createElement('button'); rm.className = 'btn-rm'; rm.textContent = 'remover';
+  rm.onclick = () => {
+    ST.vitimas = ST.vitimas.filter(x => x.id !== vit.id);
+    card.remove();
+    renumberVitimas();
+    render();
+  };
+  head.appendChild(title); head.appendChild(rm);
+
+  const grid = document.createElement('div'); grid.className = 'item-card-grid';
+
+  const selLocal  = mkSelect(LOCAL_VIT,   'Selecione a localização…', vit.local,   val => { vit.local = val; });
+  const selPos    = mkSelect(POSICAO_VIT, 'Selecione a posição…',     vit.posicao, val => { vit.posicao = val; });
+  const selEstado = mkSelect(ESTADO_VIT,  'Selecione o estado…',      vit.estado,  val => { vit.estado = val; });
+
+  grid.appendChild(fieldWrap('Localização', selLocal));
+  grid.appendChild(fieldWrap('Posição corporal', selPos));
+
+  const wEst = fieldWrap('Estado inicial', selEstado);
+  wEst.classList.add('item-card-full');
+
+  card.appendChild(head);
+  card.appendChild(grid);
+  card.appendChild(wEst);
+  c.appendChild(card);
+}
+
+function renumberVitimas() {
+  const ords = ['Primeira','Segunda','Terceira','Quarta','Quinta','Sexta','Sétima','Oitava','Nona','Décima'];
+  ST.vitimas.forEach((vit, i) => {
+    const t = document.getElementById(`vit-title-${vit.id}`);
+    if (t) t.textContent = `${ords[i] || (i+1)+'ª'} Vítima`;
+  });
+}
+
+function renumberCards(containerId, titlePrefix, arr, label) {
+  arr.forEach((item, i) => {
+    const t = document.getElementById(titlePrefix + item.id);
+    if (t) t.textContent = `${label} ${i+1}`;
+  });
+}
+
+// ── RENDER TEXTO ──────────────────────────────────────────────────────────
+function render() {
+  const parts = [];
+  const cena = ST.cena;
+
+  // 1. Chegada + status da cena
+  const segs = [];
+  if (cena.has('segura'))    segs.push('cena segura para o atendimento');
+  if (cena.has('incendio'))  segs.push('risco de incêndio por presença de combustível');
+  if (cena.has('vazamento')) segs.push('vazamento de fluidos dos veículos envolvidos');
+
+  if (cena.has('andamento') && segs.length > 0) {
+    parts.push('Ao chegar ao local da ocorrência, a equipe deparou-se com a ocorrência ainda em andamento, sendo identificada ' + lista(segs) + '.');
+  } else if (cena.has('andamento')) {
+    parts.push('Ao chegar ao local da ocorrência, a equipe deparou-se com a ocorrência ainda em andamento.');
+  } else if (cena.has('estabilizada') && segs.length > 0) {
+    parts.push('Ao chegar ao local da ocorrência, a cena já se encontrava estabilizada, sendo identificada ' + lista(segs) + '.');
+  } else if (cena.has('estabilizada')) {
+    parts.push('Ao chegar ao local da ocorrência, a cena já se encontrava estabilizada.');
+  } else if (segs.length > 0) {
+    parts.push('Ao chegar ao local da ocorrência, foi encontrada ' + lista(segs) + '.');
+  }
+
+  // 2. Veículos
+  const vok = ST.veiculos.filter(v => v.tipo && v.posicao);
+  if (vok.length > 0) {
+    const nums = ['','um','dois','três','quatro','cinco','seis','sete','oito','nove','dez'];
+    const nStr = nums[vok.length] ?? String(vok.length);
+    const plural = vok.length > 1 ? 'veículos' : 'veículo';
+    const envolvido = vok.length > 1 ? 'envolvidos' : 'envolvido';
+    const vStrs = vok.map(v => {
+      const tipo = TIPOS_V.find(t => t.id === v.tipo);
+      const pos  = POSICOES_V.find(p => p.id === v.posicao);
+      return tipo.gen === 'f' ? `${tipo.art} ${pos.tf}` : `${tipo.art} ${pos.tm}`;
+    });
+    if (vok.length === 1) {
+      parts.push(`Havia ${nStr} ${plural} ${envolvido} na ocorrência: ${vStrs[0]}.`);
+    } else {
+      parts.push(`Havia ${nStr} ${plural} ${envolvido} na ocorrência: ${vStrs.slice(0,-1).join('; ')}; e ${vStrs[vStrs.length-1]}.`);
+    }
+  }
+
+  // 3. Vítimas
+  const nVit = ST.vitimas.length;
+  if (nVit > 0) {
+    const nums = ['','uma','duas','três','quatro','cinco','seis','sete','oito','nove','dez'];
+    const nStr = nums[nVit] ?? String(nVit);
+    const intro = nVit === 1 ? 'Foi localizada uma vítima na cena' : `Foram localizadas ${nStr} vítimas na cena`;
+    const ords  = ['primeira','segunda','terceira','quarta','quinta','sexta','sétima','oitava','nona','décima'];
+
+    const detalhes = ST.vitimas.map((vit, i) => {
+      const local  = LOCAL_VIT.find(p => p.key === vit.local);
+      const posic  = POSICAO_VIT.find(p => p.key === vit.posicao);
+      const estado = ESTADO_VIT.find(p => p.key === vit.estado);
+      const pred = [];
+      if (local)  pred.push(local.txt);
+      if (posic)  pred.push(posic.txt);
+      if (estado) pred.push(estado.txt);
+      if (!pred.length) return null;
+      const pref = nVit > 1 ? `a ${ords[i] ?? (i+1)+'ª'} vítima` : 'a vítima';
+      return `${pref} encontrada ${pred.join(', ')}`;
+    }).filter(Boolean);
+
+    if (!detalhes.length) {
+      parts.push(intro + '.');
+    } else if (nVit === 1) {
+      parts.push(`${intro}, ${detalhes[0]}.`);
+    } else {
+      const corpo = detalhes.length === 1 ? detalhes[0] : detalhes.slice(0,-1).join('; ') + '; e ' + detalhes[detalhes.length-1];
+      parts.push(`${intro}: ${corpo}.`);
+    }
+  }
+
+  // 4. Forças no local
+  const forcas = [];
+  if (cena.has('samu'))    forcas.push('equipe do SAMU');
+  if (cena.has('amb'))     forcas.push('outra ambulância');
+  if (cena.has('pmerj'))   forcas.push('guarnição da PMERJ');
+  if (cena.has('pccivil')) forcas.push('agentes da Polícia Civil');
+  if (forcas.length === 1) parts.push(`Havia ${forcas[0]} no local.`);
+  else if (forcas.length > 1) parts.push(`Encontravam-se no local ${forcas.slice(0,-1).join(', ')} e ${forcas[forcas.length-1]}.`);
+
+  // 5. Populares
+  const pops = [];
+  if (cena.has('pop_redor'))   pops.push('havia populares ao redor da cena');
+  if (cena.has('pop_acionou')) pops.push('o acionamento do socorro foi realizado por popular que presenciou a ocorrência');
+  if (cena.has('pop_aux'))     pops.push('populares já realizavam primeiros auxílios antes da chegada');
+  if (cena.has('pop_moveu'))   pops.push('populares haviam movimentado a vítima');
+  if (cena.has('sem_test'))    pops.push('não foram localizadas testemunhas do ocorrido');
+  if (pops.length === 1) parts.push(cap(pops[0]) + '.');
+  else if (pops.length > 1) parts.push(cap(pops.slice(0,-1).join('; ')) + '; ' + pops[pops.length-1] + '.');
+
+  // 6. Complemento
+  if (ST.complemento.trim()) parts.push(fin(ST.complemento.trim()));
+
+  // Exibe
+  const ptext  = document.getElementById('ptext');
+  const pstat  = document.getElementById('pstatus');
+  const pchars = document.getElementById('pchars');
+
+  if (!parts.length) {
+    ptext.innerHTML = '<em>Preencha os campos ao lado para gerar o texto do relatório.</em>';
+    pstat.textContent = 'aguardando…';
+    pchars.textContent = '';
+  } else {
+    const txt = parts.join(' ');
+    ptext.textContent = txt;
+    pstat.textContent = `${parts.length} bloco(s)`;
+    pchars.textContent = `${txt.length} caracteres`;
+  }
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────
+function cap(s) { return s ? s[0].toUpperCase() + s.slice(1) : s; }
+function fin(s) { return s.endsWith('.') ? s : s + '.'; }
+function lista(arr) {
+  if (arr.length === 1) return arr[0];
+  return arr.slice(0,-1).join(', ') + ' e ' + arr[arr.length-1];
+}
+
+function copyText() {
+  const p = document.getElementById('ptext');
+  if (p.querySelector('em')) return;
+  navigator.clipboard.writeText(p.textContent).then(() => {
+    const b = document.getElementById('copyBtn');
+    b.textContent = '✓ Copiado!'; b.classList.add('ok');
+    setTimeout(() => { b.textContent = 'Copiar para relatório'; b.classList.remove('ok'); }, 2200);
+  });
+}
+
+// ── MANTÉM O ESPAÇO DE ROLAGEM SEMPRE ATUALIZADO ───────────────────────────
+(function () {
+  const header = document.querySelector('.sticky-header');
+  if (!header) return;
+  function updateOffset() {
+    document.documentElement.style.setProperty('--sticky-offset', (header.offsetHeight + 8) + 'px');
+  }
+  updateOffset();
+  if (window.ResizeObserver) {
+    new ResizeObserver(updateOffset).observe(header);
+  } else {
+    window.addEventListener('load', updateOffset);
+    window.addEventListener('resize', updateOffset);
+  }
+})();
+
+function clearAll() {
+  ST.cena.clear();
+  ST.veiculos = []; vcnt = 0;
+  ST.vitimas = [];  vitcnt = 0;
+  ST.complemento = '';
+  ST.cena.clear();
+  document.querySelectorAll('.dropdown-option').forEach(o => o.classList.remove('selected'));
+  Object.keys(CENA_GRUPOS).forEach(g => updateGroupTags(g));
+  document.getElementById('v-container').innerHTML = '';
+  document.getElementById('vit-container').innerHTML = '';
+  document.getElementById('ta-comp').value = '';
+  render();
+}
+</script>
+</body>
+</html>
